@@ -624,6 +624,107 @@ int It_Seidel   (ode_sys *system, solution *u, val_type tn,val_type h,
 }	
 
 
+/****************************************************************************************/
+/*											*/
+/*      It_Seidel									*/
+/*											*/
+/****************************************************************************************/
+
+
+int It_Seidel_Classic   (ode_sys *system, solution *u, val_type tn,val_type h, 
+                         gauss_method *method,solver_stat *thestatptr)
+{
+
+     int extern thread_count;
+
+/* ---------- First initializations ------------------------------------*/
+
+     int neq,ns;
+     parameters *params;
+     val_type *z,*li;
+    
+     neq=system->neq;
+     ns=method->ns;
+     params=&system->params;
+
+     val_type fz[ns*neq];
+     z=thestatptr->z;
+     li=thestatptr->li;
+
+/*------ declarations --------------------------------------------------*/
+
+     int i,is,js,isn,in,jsn;
+     val_type sum;
+  
+/* ----------- implementation  --------------------------------------*/ 
+
+
+/* ----------- first part  -----------------------------------------*/ 
+#ifdef PARALLEL
+#      pragma omp parallel for num_threads(thread_count) private(isn)
+#endif  
+     for (is = 0; is<ns; is++)
+     {
+           isn=neq*is;
+           params->ipar[0]=system->cod[0];
+           thestatptr->fcn++;
+           system->f(neq,tn+method->hc[is],&z[isn],&fz[isn],params);
+           for (i=0; i<neq/2; i++) li[isn+i]=fz[isn+i]*method->hb[is];	
+     }
+
+     for (is = 0; is<ns; is++)
+     { 
+           for (i = 0; i<neq/2; i++)    
+           {  
+                 in=neq*is+i; 
+//                 sum=method->m[ns*is]*li[i]+u->ee[i];
+                 sum=method->m[ns*is]*li[i];                        
+                 for (js =1; js<ns; js++)
+                 {
+                       jsn=ns*is+js;
+                       sum+=method->m[jsn]*li[neq*js+i];
+                 }
+
+                 z[in]=u->uu[i]+sum;        
+           }
+     } 
+
+
+/* ----------- second part  --------------------------------------*/ 
+
+#ifdef PARALLEL
+#      pragma omp parallel for num_threads(thread_count) private(isn)
+#endif  
+     for (is = 0; is<ns; is++)
+     {
+           isn=neq*is;
+           params->ipar[0]=system->cod[1];
+           system->f(neq,tn+method->hc[is],&z[isn],&fz[isn],params);
+           for (i=neq/2; i<neq; i++) li[isn+i]=fz[isn+i]*method->hb[is];		
+      }
+
+     for (is = 0; is<ns; is++)
+     { 
+           for (i=neq/2; i<neq; i++)    
+           {  
+                 in=neq*is+i; 
+//                 sum=method->m[ns*is]*li[i]+u->ee[i];
+                 sum=method->m[ns*is]*li[i];
+                         
+                 for (js =1; js<ns; js++)
+                 {
+                       jsn=ns*is+js;
+                       sum+=method->m[jsn]*li[neq*js+i];
+                 }
+
+                 z[in]=u->uu[i]+sum;        
+            }
+     } 
+    
+     return(0);
+
+}	
+
  
 void TheOutput(ode_sys *system,val_type t,solution *u,solver_stat *thestatptr,
                parameters *params,toptions *options,FILE *myfile)
@@ -1113,6 +1214,13 @@ void select_gauss(gauss_method *gsmethodptr, gauss_method *gsmethod2ptr,solution
 
     case  11:  /* Seidel */
           optionsptr->iteration[0]=It_Seidel;
+          systemptr->cod[0]=1;
+          systemptr->cod[1]=2;
+	  RKG (gsmethodptr,uptr,systemptr,optionsptr,Fixed_point_it,thestatptr);
+    break;  
+
+    case  19:  /* Seidel_Classic */
+          optionsptr->iteration[0]=It_Seidel_Classic;
           systemptr->cod[0]=1;
           systemptr->cod[1]=2;
 	  RKG (gsmethodptr,uptr,systemptr,optionsptr,Fixed_point_it,thestatptr);

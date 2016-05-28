@@ -66,6 +66,11 @@ int It_Seidel
  gauss_method *method,solver_stat *thestatptr
 );
 
+int It_Seidel_Classic
+(ode_sys *system, solution *u, val_type tn,val_type h, 
+ gauss_method *method,solver_stat *thestatptr
+);
+
 
 void TheOutput
 (ode_sys *system,val_type t,solution *u,solver_stat *thestatptr,

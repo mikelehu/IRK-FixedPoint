@@ -182,7 +182,7 @@ void mathGauss (int neq, int n, int ns, double t0, double tend,
 
     switch (options.algorithm)
     {  
-    case 1: case 11: case 9:
+    case 1: case 11: case 9: case 19:
 
           if (!MLPutFunction(stdlink, "List",12)) MLErrorMessage(stdlink);
           if (!MLPutReal64( stdlink,thestat.MaxDE)) MLErrorMessage(stdlink); 
