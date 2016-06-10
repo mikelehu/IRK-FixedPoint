@@ -42,9 +42,8 @@ void RemoveDigitsFcn
 
 void UpdateDMin
 (ode_sys *system,gauss_method *method,
- bool *D0,bool *cont,val_type *DMin,val_type *Y, val_type *Yold
+ int *D0,bool *cont,val_type *DMin,val_type *Y, val_type *Yold
 );
-
 
 void Fixed_point_it
 (ode_sys *system, solution *u, val_type tn,val_type h, 

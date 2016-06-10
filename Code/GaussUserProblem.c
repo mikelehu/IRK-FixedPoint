@@ -75,7 +75,24 @@ void Ode1 (int neq, val_type t,val_type *u,val_type *f,parameters *params)
      f[0]= (2*C1*P1+aux3*P2)/aux1;
      f[1]= (2*C2*P2+aux3*P1)/aux1;
      f[2]=-(aux4+C6*sinQ1);
-     f[3]=-(-aux4+C7*sinQ2);               
+     f[3]=-(-aux4+C7*sinQ2);   
+
+
+/*   eraginkorragoa ? (08-06-2015)
+
+     aux0= C5*sinQ1Q2*sinQ1Q2;
+     aux1= 1./(C4+aux0);
+     dQ1aux1= 2.*C5*sinQ1Q2*cosQ1Q2;
+     aux2= aux1*aux1;
+     aux3= C3*cosQ1Q2;
+     aux4= aux1*((-aux1)*(C1*P1*P1+C2*P2*P2+P1*P2*aux3)*dQ1aux1-(C3*P1*P2*sinQ1Q2));
+
+
+     f[0]= (2.*C1*P1+aux3*P2)*aux1;
+     f[1]= (2.*C2*P2+aux3*P1)*aux1;
+     f[2]=-(aux4+C6*sinQ1);
+     f[3]=(aux4-C7*sinQ2);                 
+*/
                         
      return ;
 
@@ -616,8 +633,8 @@ void Ode12 (int neq, val_type t,val_type *u,val_type *f,parameters *params)
                        j1=j*dim;
                        j2=nd+j1;
                        d3=0.;
-                       for (id=0; id<dim; id++) d3+=POW(Udouble[i1+id]-Udouble[j1+id],2);
-                       d3=POW(d3,3./2);
+                       for (id=0; id<dim; id++) d3+=pow(Udouble[i1+id]-Udouble[j1+id],2);
+                       d3=pow(d3,3./2);
 
                        for (id=0; id<dim; id++) 
                        {
@@ -652,8 +669,8 @@ void Ode12 (int neq, val_type t,val_type *u,val_type *f,parameters *params)
                        j1=j*dim;
                        j2=nd+j1;
                        d3=0.;
-                       for (id=0; id<dim; id++) d3+=POW(Udouble[i1+id]-Udouble[j1+id],2);
-                       d3=POW(d3,3./2);
+                       for (id=0; id<dim; id++) d3+=pow(Udouble[i1+id]-Udouble[j1+id],2);
+                       d3=pow(d3,3./2);
 
                        for (id=0; id<dim; id++) 
                        {

@@ -15,15 +15,19 @@ Chdata::usage=".......";
 
 Pert::usage="";
 FunMeanHerr::usage="";
+FunAllHerr::usage="";
 FunHerr::usage="";
 FunMeanEst::usage="";
 
+(*******MyFunctions-3**********)
+
+FunMeanH::usage=""; (*37-bertsioaren esperimentua egiteko: 09-06-2016*)
 
 
 Begin["`Private`"];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*MyFunctions-1*)
 
 
@@ -79,7 +83,7 @@ Flatten[Join[qnew,vnew]]
 
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*MyFunctions-2*)
 
 
@@ -111,6 +115,22 @@ For[i=1, i<= nstat,i++,
 MeanE=SHamerr/nstat;
 DesvE=Sqrt[DHamerr/nstat-MeanE^2];
 {MeanE,DesvE,SError/nstat ,EndHam}
+]
+
+
+FunAllHerr[outAll_, nstat_,nout_,HAM_,parameters_
+             ,neq_,prec_,step_Integer]:=
+Module[{i,Ham0, Hamerr,      
+             AllHamerr={}
+},
+For[i=1, i<= nstat,i++,
+  outA=outAll[[i]];
+  Ham0 = HAM[neq,First[outA],parameters,prec];
+  Hamerr = Map[HAM[neq,#,parameters,prec]/Ham0-1&,outA];
+  Hamerr=  Map[First,Partition[Hamerr,step]];
+  AppendTo[AllHamerr,Hamerr];
+];
+AllHamerr
 ]
 
 
@@ -161,6 +181,33 @@ desvQty=Sqrt[S2EstQty/nstat-meanQty^2];
 {meanEst,desvEst,meanQty,desvQty}
 ];
 
+
+
+(* ::Subsection:: *)
+(*MyFunctions-3*)
+
+
+FunMeanH[outAll_, nstat_,nout_,HAM_,parameters_
+             ,neq_,prec_,step_Integer]:=
+Module[{i,Ham0, Hamerr,Error,
+             SHamerr=Array[0 &,Floor[nout/step]],
+             DHamerr=Array[0 &,Floor[nout/step]],
+             EndHam=Array[0&,nstat],outA,outB,MeanE,DesvE},
+For[i=1, i<= nstat,i++,
+  outA=outAll[[i]];
+  Ham0 = HAM[neq,First[outA],parameters,prec];
+  Hamerr = Map[HAM[neq,#,parameters,prec]/Ham0-1&,outA];
+  Hamerr=  Map[First,Partition[Hamerr,step]];
+  EndHam[[i]]=Last[Hamerr];
+(*  SHamerr=SHamerr+Abs[Hamerr];*)
+  SHamerr=SHamerr+Hamerr;
+  DHamerr=DHamerr+Hamerr^2;
+ 
+];
+MeanE=SHamerr/nstat;
+DesvE=Sqrt[DHamerr/nstat-MeanE^2];
+{MeanE,DesvE,EndHam}
+]
 
 
 (* ::Subsection:: *)

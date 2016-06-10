@@ -265,8 +265,9 @@ int Yi_init(solution *u, val_type *z,ode_sys *system,
 /* 											*/
 /* 											*/
 /****************************************************************************************/
+
 void UpdateDMin (ode_sys *system,gauss_method *method,
-                 bool *D0,bool *cont,val_type *DMin,val_type *Y,val_type *Yold)
+                 int *D0,bool *cont,val_type *DMin,val_type *Y,val_type *Yold)
 {
 /*----------------  First: initialization -------------------------------*/
      int neq,ns;
@@ -280,7 +281,7 @@ void UpdateDMin (ode_sys *system,gauss_method *method,
 
 /* ----------- implementation  --------------------------------------*/ 
 
-     *D0=true;
+     *D0=0;
      *cont=false;
 
      for (is=0; is<ns; is++)
@@ -289,8 +290,8 @@ void UpdateDMin (ode_sys *system,gauss_method *method,
                dY=FABS(Y[is*neq+i]-Yold[is*neq+i]);
                if (dY>0.)
                { 
-                    *D0=false;
-                    if (dY<DMin[is*neq+i])
+                    
+                   if (dY<DMin[is*neq+i])
                     {
                          DMin[is*neq+i]=dY;
                          *cont=true;
@@ -303,12 +304,14 @@ void UpdateDMin (ode_sys *system,gauss_method *method,
                else
                {
                     DMin[is*neq+i]=0;
+                    *D0=*D0+1;
                } 
           }
   
      return;
 
 }
+
 
 
 /****************************************************************************************/
@@ -333,7 +336,9 @@ void Fixed_point_it ( ode_sys *system, solution *u, val_type tn,val_type h,
 /*------ declarations --------------------------------------------------*/
 
      int i,is;
-     bool D0,iter0;			
+     bool iter0;
+//     bool D0;			
+     int D0;
      val_type difftest,DMin[neq*ns];
      val_type *z;
      val_type zold[neq*ns];
@@ -367,7 +372,7 @@ void Fixed_point_it ( ode_sys *system, solution *u, val_type tn,val_type h,
            thestatptr->convergence=FAIL; 
      }
  
-     if (D0==false)
+     if (D0<(ns*neq))
      {
            difftest=NormalizedDistance(neq,ns,options,z,zold);
            if (difftest>1.)
@@ -878,6 +883,7 @@ void RKG (gauss_method *gsmethod, solution *u,ode_sys *system,toptions *options,
      val_type tn;             
      val_type u0,sum,aux;  
      val_type *z,*li;
+     val_type mY,mYY;   //removedigits
 
      z=thestatptr->z;
      li=thestatptr->li;
@@ -945,6 +951,7 @@ void RKG (gauss_method *gsmethod, solution *u,ode_sys *system,toptions *options,
                     isn=neq*is+i;
                     sum+=li[isn];
                } 
+
 
      /* ----------------compensated sumation ------------------------------------*/  
 
