@@ -6,9 +6,9 @@
 
 BeginPackage["GaussCoefficients`"];
 
-NN::usage=" ";
-GaussCoefficients::usage=" ";
-InterpolationCoeff::usage=" ";
+NN::usage=" NN[y,m] gives m-digit precision number ";
+GaussCoefficients::usage=" GaussCoefficients[s,prec] gives {m,a,b,c} s-stage Gauss method coefficients ";
+InterpolationCoeff::usage=" InterpolationCoeff[s,prec] gives {nu} s-stage Gauss method's Interpolation Coefficients";
 
 Begin["`Private`"];
 
@@ -17,16 +17,20 @@ Begin["`Private`"];
 (*Functions*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Functions*)
 
 
-NN[y_,doi_]:=Module[{d,exp,naux,m},
-(*exp=Last[RealDigits[y,2]];*)
-{d,exp}=RealDigits[y,2,doi];
-naux=-exp+doi;
-m=2^naux;
-Round[y*m]/m
+NN[y_,m_]:=
+(*
+   y: real number.
+   m: m-digit precision
+*)
+Module[{d,exp,naux,n},
+     {d,exp}=RealDigits[y,2,m];
+     naux=-exp+m;
+     n=2^naux;
+     Round[y*n]/n
 ];
 SetAttributes[NN,Listable];
 
@@ -38,55 +42,70 @@ SetAttributes[NN,Listable];
 
 
 GaussCoefficients[s_,prec_]:=
-Module[{highprec,ks,i,j, bits,
-        a,b,c,m,aD,bD,cD,mD,nuD,aDD,bDD,cDD,mDD},
+(*
 
-highprec=200;
+   s:     number of stages of RK method
+   prec:  precision (MachinePrecision\[TildeTilde]16, 
+                      QuadruplePrecision \[TildeTilde]34, ...) 
 
-ks=Flatten[NDSolve`ImplicitRungeKuttaGaussCoefficients[2*s,highprec],1];
-a=Simplify[Table[ks[[i]],{i,1,s}]];
-b=Table[ks[[i+s]],{i,1,s}];
-c=Table[ks[[i+2 s]],{i,1,s}];
-m=Table[a[[i,j]]/b[[j]],{i,s},{j,s}];
+*)
+Module[{highprec,i,j,
+        coef,
+        mantisa,
+        a,b,c,m,aD,bD,cD,mD,aDD,cDD},
 
-bits=Round[Log[2.,10] prec];
+       highprec=200;
 
-mD=Map[NN[#,bits] &,m];
-Do[Do[mD[[i,j]]=NN[mD[[i,j]],bits],{j,i-1}],{i,s}];
-Do[Do[mD[[j,i]]=1-mD[[i,j]],{j,i-1}],{i,s}];
+     coef=Flatten[NDSolve`ImplicitRungeKuttaGaussCoefficients[2*s,highprec],1];
+     a=Table[coef[[i]],{i,1,s}];
+     b=Table[coef[[i+s]],{i,1,s}];
+     c=Table[coef[[i+2 s]],{i,1,s}];
+     m=Table[a[[i,j]]/b[[j]],{i,s},{j,s}];
 
-bD=Map[NN[#,bits] &,b];
+     mantisa=Round[Log[2.,10] prec];
 
-aDD= mD . DiagonalMatrix[bD];
-cDD=Table[Sum[mD[[i,j]]*bD[[j]],{j,s}],{i,s}]; 
+     mD=Map[NN[#,mantisa] &,m];
+     Do[Do[mD[[i,j]]=NN[mD[[i,j]],mantisa],{j,i-1}],{i,s}];
+     Do[Do[mD[[j,i]]=1-mD[[i,j]],{j,i-1}],{i,s}];
 
-aD=Map[NN[#,bits] &,aDD];
-cD=Map[NN[#,bits] &,cDD];
+     bD=Map[NN[#,mantisa] &,b];
 
-{mD,aD,bD,cD}                          
+     aDD= mD . DiagonalMatrix[bD];
+     cDD=Table[Sum[mD[[i,j]]*bD[[j]],{j,s}],{i,s}]; 
+
+     aD=Map[NN[#,mantisa] &,aDD];
+     cD=Map[NN[#,mantisa] &,cDD];
+
+     {mD,aD,bD,cD}                          
                            
 ];
 
 
 InterpolationCoeff[s_,prec_]:=
-Module[{aa,bb,cc,mm,nu,nuD,
-interpolationData,Y,F,P,Yrule,t,
-h,i,j,ai,aux,bits},
+(*
 
-bits=Round[Log[2.,10] prec];
-{mm,aa,bb,cc}=N[GaussCoefficients[s,prec],2*prec];
-AppendTo[cc, 1];
+   s:     number of stages of RK method
+   prec:  precision (MachinePrecision\[TildeTilde]16, 
+                      QuadruplePrecision \[TildeTilde]34, ...) 
 
-interpolationData = Table[{-1+cc[[i]],Y[i]},{i,s+1}];
-Yrule = {Y[i_/;i<= s]:> Y[s+1]+h Sum[(-bb[[j]]+aa[[i,j]])F[j],{j,s}]};
-P[t_]=Collect[InterpolatingPolynomial[interpolationData,t],Y[_]];
+*)
+      Module[{aa,bb,cc,mm,nu,ai,
+      interpolationData,Y,F,P,Yrule,t,
+      h,i,j,aux,mantisa},
 
-aux=Table[P[cc[[i]]],{i,s}]/.Yrule//Expand;
-ai=Map[NN[#,bits] &,Map[D[aux/.{h->1},#]&,Array[F,s]]]//Transpose;
+      mantisa=Round[Log[2.,10] prec];
+      {mm,aa,bb,cc}=N[GaussCoefficients[s,prec],2*prec];
+      AppendTo[cc, 1];
 
-nu=Table[ai[[i,j]]/bb[[j]],{i,s},{j,s}];
+      interpolationData = Table[{-1+cc[[i]],Y[i]},{i,s+1}];
+      Yrule = {Y[i_/;i<= s]:> Y[s+1]+h Sum[(-bb[[j]]+aa[[i,j]])F[j],{j,s}]};
+      P[t_]=Collect[InterpolatingPolynomial[interpolationData,t],Y[_]];
 
-Rationalize[nu,0]
+      aux=Table[P[cc[[i]]],{i,s}]/.Yrule//Expand;
+      ai=Map[NN[#,mantisa] &,Map[D[aux/.{h->1},#]&,Array[F,s]]]//Transpose;
+
+      nu=Table[ai[[i,j]]/bb[[j]],{i,s},{j,s}];
+      Rationalize[nu,0]
 
 ];
 

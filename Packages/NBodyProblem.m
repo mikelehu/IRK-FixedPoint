@@ -12,7 +12,10 @@ NBodyODEc::usage=" ";
 NBodyODEd::usage=" ";
 NBodyODEfunc::usage=" ";
 
-NBodyHam2::usage="";
+NBodyHam::usage="";
+NBodyMom::usage="";
+
+NBodyHam3::usage=" Fortran";
 
 Begin["`Private`"];
 
@@ -153,7 +156,7 @@ f
 (*Hamiltonian C*)
 
 
-NBodyHam2[neq_,out_,parameters_List, doi_:100]:=
+NBodyHam[neq_,out_,parameters_List, doi_:100]:=
 Module[{dim,d,nbody,Gm,uu,H,P,r,i,i1,i2,j,j1,j2,id,
               qi,qj,qij,vi,
               d1,d2,d3,d4},
@@ -185,6 +188,69 @@ Do[ i1=(i-1)*dim;
  {j,i+1,nbody}],
 {i,nbody}];
 H/2-P
+];
+
+
+(* ::Subsubsection:: *)
+(*Hamiltonian Fortran*)
+
+
+NBodyHam3[neq_,out_,parameters_List, doi_:100]:=
+Module[{dim,d,nbody,Gm,uu,H,P,r,i,i1,i2,j,j1,j2,id,
+              qi,qj,qij,vi,
+              d1,d2,d3,d4},
+dim=3;
+d=neq/2;
+nbody=neq/(2*dim);
+
+d1=2;
+d2=nbody*(2*dim)+1;
+d3=d2+1;
+d4=d3+nbody*(2*dim)-1;
+
+(*uu=SetPrecision[out[[d1;;d2]],doi]+SetPrecision[out[[d3;;d4]],doi];*)
+uu=SetPrecision[out[[d1;;d2]],doi];
+
+Gm =SetPrecision[parameters,doi];
+H=0;
+P=0;
+Do[ i1=(i-1)*dim;
+      i2=d+i1;
+      qi=Table[uu[[i1+id]],{id,1,dim}];
+      vi=Table[uu[[i2+id]],{id,1,dim}];
+      H=H+Gm[[i]]*(vi.vi);
+      Do [    j1=(j-1)*dim;
+                j2=d+j1;
+                qj=Table[uu[[j1+id]],{id,1,dim}];
+                qij=qi-qj;
+                r=Norm[qij];
+                P=P+Gm[[i]]*Gm[[j]]/r,
+ {j,i+1,nbody}],
+{i,nbody}];
+H/2-P
+];
+
+
+(* ::Subsection::Closed:: *)
+(*Angular Momentum*)
+
+
+NBodyMom[neq_,out_,parameters_List, doi_:100]:=
+Module[{dim,d,nbody,Gm,qv,
+        d1,d2,d3,d4},
+dim=3;
+d=neq/2;
+nbody=neq/(2*dim);
+
+d1=2;
+d2=nbody*(2*dim)+1;
+d3=d2+1;
+d4=d3+nbody*(2*dim)-1;
+
+Gm =SetPrecision[parameters,doi];
+qv=Partition[SetPrecision[out[[d1;;d2]],doi]+SetPrecision[out[[d3;;d4]],doi],dim];
+
+Sum[Gm[[i]]*(qv[[i]]\[Cross]qv[[nbody+i]]),{i,nbody}]
 ];
 
 

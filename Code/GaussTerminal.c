@@ -1,8 +1,8 @@
-/*------------------------------------------------------------------------------*/
-/*										*/
-/*                                GaussTerminal.c				*/
-/*										*/
-/* -----------------------------------------------------------------------------*/
+/* ---------------------------------------------------------------------------*/
+/*								              */
+/*                                GaussTerminal.c			      */
+/*								              */
+/* ---------------------------------------------------------------------------*/
 
 #include <GaussTerminal.h>
 
@@ -13,7 +13,7 @@ int thread_count=1;
 int main()
 {
 
-/*------ declarations --------------------------------------------------*/    
+/*------ declarations --------------------------------------------------------*/    
 
      int i;   
 	
@@ -44,33 +44,38 @@ int main()
      char buf[128];
 #    endif
 
-/* ----------- implementation  ---------------------------------------*/     
+/* ----------- implementation  -----------------------------------------------*/     
 
 
-/* ----------- integration parameters---------------------------------*/  
+/* ----------- integration parameters-----------------------------------------*/  
 
-     gsmethod.ns = 6;     				 //	 Stages.
-     options.h = POW(2,-7);	       			 //	 Stepsize. 
-     options.sampling=1;   			 	 //      
+     gsmethod.ns = 6;     	 // Stages.
+     gsmethod2.ns=gsmethod.ns;
 
-     system.f = Ode1;					 //	 Odefun (GaussUserProblem.c: OdePendulum,OdeNBody)
-     system.ham= Ham1;					 //      Hamiltonian (GaussUserProblem.c: HamPendulum,HamNBody)
+     options.h = POW(2,-7);	 // Stepsize. 
+     options2.h = options.h;
+ 
+     options.sampling=POW(2,10);   			 	
+     system.f = Ode1;		 // Odefun 
+     system.ham= Ham1;		 // Hamiltonian 
 
-     system.problem =1; 				 //	 Initial values (GaussInitData.c).
+     system.problem =1; 	 // Initial values (GaussInitData.c).
 
-     options.approximation=1;   			 //      Approximation: Y^[0] (GaussCommon.c/Yi_init()).
+     options.approximation=1;  	 // Approximation: Y^[0] (GaussCommon.c/Yi_init()).
 	
-     strncpy(thestat.filename, "AllSolve1.bin",STRMAX);   //     Output filename.
+     strncpy(thestat.filename, "Output.bin",STRMAX);   // Output filename.
 
-     options.algorithm=1;    				 //	 1=Jacobi;  11=Seidel;    
+     options.algorithm=1;    	 // (1=Jacobi,11=Seidel,...).    
      options.rdigits=0;       
      options2.rdigits=3;
 
-/* ----------- execution  ------------------------------------------*/
+/* ----------- execution  ----------------------------------------------------*/
 
      printf("Begin execution \n");
-     printf("method=%i, problem=%i, algorithm=%i\n",gsmethod.ns,system.problem,options.algorithm);
-     printf("approximation=%i,sampling=%i\n",options.approximation,options.sampling);
+     printf("method=%i, problem=%i, algorithm=%i\n",
+             gsmethod.ns,system.problem,options.algorithm);
+     printf("approximation=%i,sampling=%i\n",
+             options.approximation,options.sampling);
 
 #if PREC ==2  //QUADRUPLEPRECISION
      printf("options.h=");
@@ -91,14 +96,13 @@ int main()
           options.atol[i]=ATOL;
      }
 
+
      if (options.rdigits>0) options.mrdigits=pow(2,options.rdigits);
      if (options2.rdigits>0) options2.mrdigits=pow(2,options2.rdigits);
 
-     GaussCoefficients(&gsmethod,&options);
-   
-     InitStat(&system,&gsmethod,&thestat);	
-   
-
+     GaussCoefficients(DIR_TERM,&gsmethod,&options); 
+     GaussCoefficients(DIR_TERM,&gsmethod2,&options2); 
+     InitStat(&system,&gsmethod,&thestat);
      print_u(system.neq, u.uu);
 
      wtime0= time(NULL);
@@ -110,23 +114,26 @@ int main()
      clock1=clock();
      wtime1= time(NULL);
 
-     printf("End execution \n");
-        
+/* --------- Results ---------------------------------------------------------*/
+     printf("End execution \n");   
      if (thestat.convergence==SUCCESS)
      {
            printf("Execution Correct\n");
-           printf("convergence=%i.  (=0 correct;=-1 incorrect)\n",thestat.convergence);        
+           printf("convergence=%i.  (=0 correct;=-1 incorrect)\n",
+                   thestat.convergence);        
 
            print_u (system.neq,u.uu);
 #if PREC ==2  //QUADRUPLEPRECISION
            printf("Max-DE");
-           n = quadmath_snprintf(buf, sizeof buf, "%+-#*.30Qe", width, thestat.MaxDE);
+           n = quadmath_snprintf(buf, sizeof buf, 
+                                 "%+-#*.30Qe", width, thestat.MaxDE);
            if ((size_t) n < sizeof buf) printf("%s\n",buf);
 #else  // DOUBLEPRECISION    
            printf("Energy MaxDE=%.20lg\n",thestat.MaxDE);
 #endif                      
 
-           printf ("\nCPU time:%lg\n", (double) (clock1 - clock0)/CLOCKS_PER_SEC);
+           printf ("\nCPU time:%lg\n", 
+                  (double) (clock1 - clock0)/CLOCKS_PER_SEC);
 	   printf ("Elapsed wall clock time: %ld\n", (wtime1 - wtime0));
            printf ("Elapsed wall clock time: %lg\n", difftime(wtime1, wtime0));
 
@@ -149,14 +156,30 @@ int main()
      else
      {
            printf("Execution InCorrect\n");
-           printf("convergence=%i.  (=0 correct;=-1 incorrect)\n",thestat.convergence);
+           printf("convergence=%i.  (=0 correct;=-1 incorrect)\n",
+                   thestat.convergence);
      }
  
-     free(params.rpar); free(params.ipar);
-     free(u.uu); free(u.ee);
-     free(u2.uu); free(u2.ee);
+    free(params.rpar); free(params.ipar);
+    free(u.uu); free(u.ee);
+    free(u2.uu); free(u2.ee);
+
+    free(options.rtol); free(options.atol);
+
+    free(gsmethod.m); 
+    free(gsmethod.a);
+    free(gsmethod.b); 
+    free(gsmethod.hb);      
+    free(gsmethod.c); 
+    free(gsmethod.hc); 
+    free(gsmethod.nu); 
+    free(gsmethod.orderedindices);
+
+    free(thestat.z); 
+    free(thestat.li);
+    free(thestat.fz);
     
-     exit(0);
+    exit(0);
 
 }
 

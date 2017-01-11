@@ -4,10 +4,10 @@ Readme.txt
      Gauss Implicit Runge-Kutta implementation. 
      Fixed-Point iteration.
 
-     version: 1 (04-02-2016).
+     version: 1 (01-01-2017).
 
      Article: "Reducing and monitoring round-off error propagation for sympletic
-              implicit Runge-Kutta schemes" (2016). 
+               implicit Runge-Kutta schemes" (2017). 
 
 ********************************************************************************
 CONTENTS:
@@ -17,11 +17,11 @@ CONTENTS:
                         You must specify math-functions of you Odefun. 
 
    GaussTerminal.c:     An example to show how to call the numerical integration.
-   math-Gauss.c:	An auxiliar file to call from mathematica (double). 
+   math-Gauss.c:	An auxiliar file to call from mathematica (double precision). 
    math-GaussPar.c:     An auxiliar file to call from mathematica (two integration in parallel).
-   quad-Gauss.c:	An auxiliar file to call from mathematica (quadruple).
+   quad-Gauss.c:	An auxiliar file to call from mathematica (quadruple precision).
 
-   GaussInitData.c:     Contain "InitialData" with the initial values for double pendulum problem.
+   GaussInitData.c:     Contain "InitialData" with the initial values for some problems.
 
    GaussCoefficients.c: Coefficients mij,bi,ci that define Inplicit Runge-Kutta method.
 
@@ -30,22 +30,23 @@ CONTENTS:
 	RKG () : 	   IRK method.
 	RKG2():		   Both primary and secondary sequential for round-off error estimation.
 	Fixed_point_it (): Fixed iteration method.	
-	It_Jacobi():								
-	It_Seidel():	
-	Yi_init();												
+	It_Jacobi():	   Standard fixed point iteration.							
+	It_Seidel():	   Partitioned version of the fixed point iteration.
+	Yi_init();	   Initialization functions for Yi stages.
+											
 	TheOutput():	   Output function for RKG ().
 	TheOutput2():	   Output function for RKG-2 ().
 
-	NormalizedDistance():
-	UpdateDMin ():
-	RemoveDigitsFcn():				
+	NormalizedDistance(): Test of convergence of the iteration.
+	UpdateDMin ():      : Stopping criterion.
+	RemoveDigitsFcn()   : Rounding a floating point number with p-r significant binary digits.				
 							
    GaussUserProblem.c:  Double pendulum and N-Body ode system:
 														
-	OdePendulum():	
-	HamPendulum():	
-	OdeNBody():
-	HamNBody():
+	Ode1()=OdePendulum():	
+	Ham1()=HamPendulum():	
+	Ode2()=OdeNBody():
+	Ham2()=HamNBody():
 
    math-Gauss.tm:	Mathlink file.
    quad-Gauss.tm:	Mathlink file.
@@ -58,17 +59,18 @@ OPTIONS:
 
    ns= number of stages of Inplicit Runge-Kutta method.
    eda= name of differential equation.
-   algorith= You can execute four differents kind of itegrations:
-	=  1 Jacobi fixed point iteration method. 
-	= 11 Seidel fixed point iteration method.
+
+   algorithm= You must specify one of the next implementations options:
+	=  1 Standard fixed point iteration method. 
+	= 11 Partitioned fixed point iteration method.
 	= 21 Both integrations execute sequentially (Jacobi).
         = 22 Both integrations execute sequentially (Seidel).
    
    h= stepsize.
-   sampling: for each span of day we need the output.
+   sampling: we sample the numerical results once every "sampling" steps.
    filename = output binary filename. 
 
-   thread_count: number of thread out computer have. ???
+   thread_count: number of threads for parallel computation. 
 
    note: neq, t0, tf and some others options of the problems are 
          initialized with initial values.
@@ -88,6 +90,9 @@ PARAMETERS:
        1=DOUBLEPRECISION
        2=QUADRUPLEPRECISION
        3=FLOAT.
+
+   #define DIR_TERM :  // Path Coefficients for terminal executions  
+   #define DIR_MATH :  // Path Coefficients for mathematica executions
 
 *********************************************************************************
 RESULTS:

@@ -1,7 +1,7 @@
-/*------------------------------------------------------------------------------*/
-/*										*/
-/*                                GaussCommon.h					*/
-/*										*/
+/*-----------------------------------------------------------------------------*/
+/*									       */
+/*                                GaussCommon.h				       */
+/*									       */
 /* ----------------------------------------------------------------------------*/
 
 #include <stdio.h> 
@@ -19,89 +19,159 @@
 
 
 void print_u
-(int neq,val_type *u
+(const int neq,const val_type *u
 );
 
 
 void InitStat
-(ode_sys *system,gauss_method *gsmethod, solver_stat *thestatptr
- );
+(const ode_sys *system,const gauss_method *gsmethod, solver_stat *thestatptr
+);
 
 val_type NormalizedDistance
-(int neq,int ns,toptions *options,val_type *z,val_type *zold
- );
+(const int neq,const int ns,const toptions *options,
+ const val_type *z,const val_type *zold
+);
 
-int Yi_init
-(solution *u, val_type *z,ode_sys *system,
- gauss_method *method,solver_stat *thestatptr, toptions *options
+int statYinit
+(const ode_sys *system,const gauss_method *method,
+ solver_stat *thestatptr
 );
 
 void RemoveDigitsFcn
-(ode_sys *system,gauss_method *gsmethod,val_type *z, int m
+(val_type *x,const int m
 );
 
+int Yi_init
+(const solution *u, val_type *z,const ode_sys *system,
+ const gauss_method *method,solver_stat *thestatptr,const  toptions *options
+);
+
+
 void UpdateDMin
-(ode_sys *system,gauss_method *method,
- int *D0,bool *cont,val_type *DMin,val_type *Y, val_type *Yold
+(const ode_sys *system, const gauss_method *method,
+ int *D0,bool *cont,val_type *DMin,
+ const val_type *Y, const val_type *Yold
+);
+
+
+void UpdateDMin_Classic
+(const ode_sys *system, const gauss_method *method,
+ int *D0,bool *cont,val_type *DMin,
+ const val_type *Y, const val_type *Yold
+);
+
+void UpdateDMin_SpId
+(const ode_sys *system, const gauss_method *method,
+ int *D0,bool *cont,double *DMin,
+ const val_type *Y, const val_type *Yold
 );
 
 void Fixed_point_it
-(ode_sys *system, solution *u, val_type tn,val_type h, 
- toptions *options,gauss_method *method,solver_stat *thestatptr
+(const ode_sys *system, const  solution *u, 
+ const val_type tn, const val_type h, 
+ const toptions *options, const gauss_method *method,
+ solver_stat *thestatptr
+);
+
+void Fixed_point_it_Classic
+(const ode_sys *system, const  solution *u, 
+ const val_type tn, const val_type h, 
+ const toptions *options, const gauss_method *method,
+ solver_stat *thestatptr
+);
+
+void Fixed_point_it_SpId
+(const ode_sys *system, const  solution *u, 
+ const val_type tn, const val_type h, 
+ const toptions *options, const gauss_method *method,
+ solver_stat *thestatptr
 );
 
 int It_Jacobi
-(ode_sys *system, solution *u, val_type tn,val_type h, 
- gauss_method *method,solver_stat *thestatptr
+(const ode_sys *system, const solution *u, const val_type tn,
+ const val_type h, const gauss_method *method,solver_stat *thestatptr
 );
 
 int It_Jacobi_Classic
-(ode_sys *system, solution *u, val_type tn,val_type h, 
- gauss_method *method,solver_stat *thestatptr
+(const ode_sys *system, const solution *u, const val_type tn,
+ const val_type h, const gauss_method *method,solver_stat *thestatptr
 );
 
 int It_Seidel
-(ode_sys *system, solution *u, val_type tn,val_type h, 
- gauss_method *method,solver_stat *thestatptr
+(const ode_sys *system, const solution *u, const val_type tn,
+ const val_type h, const gauss_method *method,solver_stat *thestatptr
 );
 
 int It_Seidel_Classic
-(ode_sys *system, solution *u, val_type tn,val_type h, 
- gauss_method *method,solver_stat *thestatptr
+(const ode_sys *system, const solution *u, const val_type tn,
+ const val_type h, const gauss_method *method,solver_stat *thestatptr
 );
 
-
 void TheOutput
-(ode_sys *system,val_type t,solution *u,solver_stat *thestatptr,
- parameters *params,toptions *options,FILE *loga
+(const ode_sys *system, const gauss_method *method,
+ const val_type t, const solution *u,
+ solver_stat *thestatptr,
+ const parameters *params,const toptions *options,FILE *loga
 );
 
 void TheOutput2
-(ode_sys *system,val_type t,solution *u,solution *u2,solver_stat *thestatptr,
- parameters *params,toptions *options,FILE *loga
+(const ode_sys *system, const gauss_method *method,
+ const val_type t, const solution *u,
+ const solution *u2,solver_stat *thestatptr,
+ const parameters *params,const toptions *options,FILE *loga
 );
 
+
+void CompensatedSummation 
+(const gauss_method *gsmethod,
+ val_type *u0,solution *u,
+ const ode_sys *system, const toptions *options,
+ const solver_stat *thestatptr
+);
+
+void CompensatedSummationClassic		//30-11-2016 
+(const gauss_method *gsmethod,
+ val_type *u0,solution *u,
+ const ode_sys *system, const toptions *options,
+ const solver_stat *thestatptr
+);
+
+
 void RKG 
-(gauss_method *gsmethod,
+(const gauss_method *gsmethod,
  solution *u,
- ode_sys *system, toptions *options,
+ const ode_sys *system, toptions *options,
  void RKG_Step (), solver_stat *thestatptr
 );
 
+void RKGClassic					//30-11-2016 
+(const gauss_method *gsmethod,
+ solution *u,
+ const ode_sys *system, toptions *options,
+ void RKG_Step (), solver_stat *thestatptr
+);
+
+
 void RKG2 
-(gauss_method *gsmethod, gauss_method *gsmethod2,
+(const gauss_method *gsmethod, const gauss_method *gsmethod2,
  solution *u, solution *u2,
- ode_sys *system,toptions *options,toptions *options2,
+ const ode_sys *system, toptions *options,
+ toptions *options2,
  void RKG_Step (), solver_stat *thestatptr, solver_stat *thestatptr2
 );
 
+
 void select_gauss
 (gauss_method *gsmethodptr, gauss_method *gsmethod2ptr,
- solution *uptr,solution *u2ptr,ode_sys *systemptr,
+ solution *uptr,solution *u2ptr,
+ ode_sys *systemptr,
  toptions *optionsptr,toptions *options2ptr,
  solver_stat *thestatptr,solver_stat *thestat2ptr
 );
 
+void select_odefun
+(const int codfun, ode_sys *system
+);
 
 
 

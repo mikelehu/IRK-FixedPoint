@@ -10,7 +10,7 @@ Content:
 
         GaussCoefficients.m
         MyFunctions.m
-        DoublePendulum.m:
+        DoublePendulumNEW.m:
         NbodyProblem.m:
 
   CoefficientsData: 
@@ -21,13 +21,13 @@ Content:
 	
 	DoublePendulum(NonChaotic).
 	DoublePendulum(Chaotic).
-	Nbody (solar-system).
+	Nbody (outer solar-system).
 
   Experiments:
         
 	DoublePendulum(NonChaotic).
 	DoublePendulum(Chaotic).
-	Nbody (solar-system).
+	Nbody (outer solar system).
 
 
 

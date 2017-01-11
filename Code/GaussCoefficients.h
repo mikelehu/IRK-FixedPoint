@@ -2,7 +2,12 @@
 #include <math.h>
 #include <stdio.h> 
 #include <stdlib.h>
+//#include <string.h>
 
 void GaussCoefficients
-(gauss_method *method,toptions *options
+(const char *path,gauss_method *method,const toptions *options
+);
+
+void GaussCoefficientsX
+(const char *path,gauss_method *method,const toptions *options
 );

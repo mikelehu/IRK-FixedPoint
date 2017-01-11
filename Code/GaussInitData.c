@@ -1,13 +1,13 @@
-/*------------------------------------------------------------------------------*/
-/*										*/
-/*         GaussInitData.c							*/
-/*										*/
-/*         Functions: InitialDta()						*/
-/*         Initial values:							*/
-/*		1:  Double-Pendulum non-Chaotic.				*/
-/*		2:  Double-Pendulum Chaotic.					*/
-/*		11: 9-Nbody Problem (Solar-System).				*/
-/* -----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+/*									      */
+/*         GaussInitData.c						      */
+/*									      */
+/*         Functions: InitialDta()					      */
+/*         Initial values:						      */
+/*		1:  Double-Pendulum non-Chaotic.			      */
+/*		2:  Double-Pendulum Chaotic.				      */
+/*		11: 9-Nbody Problem (Solar-System).			      */
+/* ---------------------------------------------------------------------------*/
 
 
 #include <GaussInitData.h>
@@ -29,7 +29,7 @@ void InitialData (toptions *options, solution *u,
            system->neq=4;
            system->n=2;
            options->t0=0.;
-           options->t1=pow(2,4);  //options->t1=pow(2,10);  
+           options->t1=pow(2,12);  //options->t1=pow(2,10);  
 
 #          if PREC ==2  //QUADRUPLEPRECISION
 
@@ -377,7 +377,8 @@ void InitialData (toptions *options, solution *u,
      break;
 
      default:
-           printf("Initialdata.c: problem=%i does not exist\n", system->problem);
+           printf("Initialdata.c: problem=%i does not exist\n",
+                   system->problem);
      break;
      }
 

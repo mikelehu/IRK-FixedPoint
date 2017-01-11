@@ -1,8 +1,8 @@
-/*------------------------------------------------------------------------------*/
-/*										*/
-/*                                math-GaussPar.c				*/
-/*										*/
-/* -----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+/*									      */
+/*                                math-GaussPar.c			      */
+/*									      */
+/* ---------------------------------------------------------------------------*/
 
 #include <stdlib.h>
 #include <math.h>
@@ -24,11 +24,11 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
                    val_type h, double *rpar,long rlen, int *ipar,long ilen,
                    int approximation, int threads,int algorithm1,int algorithm2,
                    int rdigits1,int rdigits2,
-                   const char *myfilename1,const char *myfilename2,int sampling,int codfun)
+                   const char *myfilename1,const char *myfilename2,
+                   int sampling,int codfun)
 
 {
-
-/*------ declarations --------------------------------------------------*/
+/*------ declarations --------------------------------------------------------*/
 
      int i;
      solution u; 
@@ -50,8 +50,7 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
  
      options.rdigits=rdigits1;       
 	    
-
-/*----- Second integrations variables ----------------------------------*/
+/*----- Second integrations variables ----------------------------------------*/
 
      solution u2;
      toptions options2;
@@ -70,7 +69,7 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
 
      options2.rdigits=rdigits2;
 
-/* ----------- implementation  --------------------------------------*/     
+/* ----------- implementation  -----------------------------------------------*/     
 
      params.rpar =(val_type *)malloc(MAXPARAM*sizeof(val_type));
      params.ipar =(int *)malloc(MAXPARAM*sizeof(int));
@@ -86,7 +85,7 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
      system.neq=neq;
      system.n=n;
 
-/* -----Second integration initialization --------------------------*/
+/* -----Second integration initialization ------------------------------------*/
 
      options2.t0=options.t0;
      options2.t1=options.t1;
@@ -102,7 +101,7 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
      strncpy(thestat2.filename, myfilename2,STRMAX); 
      InitStat(&system,&gsmethod,&thestat2);	
 
-/* ----------- execution  ------------------------------------------*/
+/* ----------- execution  ----------------------------------------------------*/
 
      for (i=0; i<rlen; i++) 
      {
@@ -163,7 +162,7 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
      if (options.rdigits>0) options.mrdigits=pow(2,options.rdigits);
      if (options2.rdigits>0) options2.mrdigits=pow(2,options2.rdigits);
   
-     GaussCoefficients(&gsmethod,&options);
+     GaussCoefficients(DIR_MATH,&gsmethod,&options);
 
      for (i=0; i<neq;i++)
      { 
@@ -179,7 +178,7 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
      wtime0= time(NULL);
      clock0= clock();
 
-/**** First integrations options ****/
+/* ---- First integrations options -------------------------------------------*/
 
      switch (options.algorithm)
      {   
@@ -199,7 +198,7 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
      break;        
      } 
 
-/**** Second integrations options ****/
+/*----- Second integrations options ------------------------------------------*/
 
      switch (options2.algorithm)
      {   
@@ -241,7 +240,7 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
      clock1=clock();
      wtime1= time(NULL);
 
-/****  Note !!! Return the first integration results ****/
+/* ----- Note !!! Return the first integration results -----------------------*/
 
      aux1[0]=thestat.totitcount;
      aux1[1]=thestat2.totitcount;
@@ -258,8 +257,10 @@ void mathGaussPar (int neq, int n, int ns, double t0, double tend,
      if (!!MLPutInteger32( stdlink,thestat.maxitcount)) MLErrorMessage(stdlink); 
      if (!!MLPutInteger32List( stdlink,aux2,2)) MLErrorMessage(stdlink); 
      if (!!MLPutInteger32( stdlink,thestat.fcn)) MLErrorMessage(stdlink); 
-     if (!MLPutReal64( stdlink,(float) (clock1 - clock0)/CLOCKS_PER_SEC)) MLErrorMessage(stdlink); 
-     if (!MLPutReal64( stdlink,(float) (wtime1 - wtime0))) MLErrorMessage(stdlink); 
+     if (!MLPutReal64( stdlink,(float) (clock1 - clock0)/CLOCKS_PER_SEC)) 
+         MLErrorMessage(stdlink); 
+     if (!MLPutReal64( stdlink,(float) (wtime1 - wtime0)))
+         MLErrorMessage(stdlink); 
      if (!MLPutInteger32( stdlink,thestat.convergence)) MLErrorMessage(stdlink);  
      if (!MLPutInteger32( stdlink,thestat.nout)) MLErrorMessage(stdlink);    
      if(! MLEndPacket(stdlink)) MLErrorMessage(stdlink);
