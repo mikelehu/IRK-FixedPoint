@@ -15,7 +15,7 @@ int main()
 
 /*------ declarations --------------------------------------------------------*/    
 
-     int i;   
+     int i,is,initmean,totmean,codfun;   
 	
      gauss_method gsmethod,gsmethod2;
      solution u,u2;
@@ -37,12 +37,9 @@ int main()
 
      options.rtol=malloc(MAXNEQ*sizeof(val_type));
      options.atol=malloc(MAXNEQ*sizeof(val_type));
+     options2.rtol=malloc(MAXNEQ*sizeof(val_type));
+     options2.atol=malloc(MAXNEQ*sizeof(val_type));
   
-#    if PREC ==2  //QUADRUPLEPRECISION
-     int n;
-     int width = 46;
-     char buf[128];
-#    endif
 
 /* ----------- implementation  -----------------------------------------------*/     
 
@@ -52,43 +49,48 @@ int main()
      gsmethod.ns = 6;     	 // Stages.
      gsmethod2.ns=gsmethod.ns;
 
-     options.h = POW(2,-7);	 // Stepsize. 
-     options2.h = options.h;
- 
-     options.sampling=POW(2,10);   			 	
-     system.f = Ode1;		 // Odefun 
-     system.ham= Ham1;		 // Hamiltonian 
-
-     system.problem =1; 	 // Initial values (GaussInitData.c).
-
-     options.approximation=1;  	 // Approximation: Y^[0] (GaussCommon.c/Yi_init()).
-	
      strncpy(thestat.filename, "Output.bin",STRMAX);   // Output filename.
 
-     options.algorithm=1;    	 // (1=Jacobi,11=Seidel,...).    
+     options.approximation=0;  	 // Approximation: Y^[0] (GaussCommon.c/Yi_init()).
+
+     options.algorithm=1;    	 // (1=Fixed point iteration,2=Error estimation).    
      options.rdigits=0;       
      options2.rdigits=3;
+
+/* ----------- problem parameters-----------------------------------------*/
+
+/* Double pendulum : NCDP or CDP */ 
+			 	
+     codfun = 1;                 // Odefun
+     system.problem =1; 	 // NCDP - Initial values (GaussInitData.c).
+     system.problem =2;          // CDP  - Initial values (GaussInitData.c).
+
+
+/* Outer solar system            */
+
+     codfun = 2;                 // Odefun
+     system.problem =3;          // OSS  - Initial values (GaussInitData.c).
+
 
 /* ----------- execution  ----------------------------------------------------*/
 
      printf("Begin execution \n");
+        
+     InitialData (&options,&u,&params,&system);
+
+     select_odefun (codfun,&system);
+     options2.h = options.h;
+                 
+     system.params.rpar=&params.rpar[0];
+     system.params.ipar=&params.ipar[0];
+
      printf("method=%i, problem=%i, algorithm=%i\n",
              gsmethod.ns,system.problem,options.algorithm);
      printf("approximation=%i,sampling=%i\n",
              options.approximation,options.sampling);
 
-#if PREC ==2  //QUADRUPLEPRECISION
-     printf("options.h=");
-     n = quadmath_snprintf(buf, sizeof buf, "%+-#*.30Qe", width, options.h);
-     if ((size_t) n < sizeof buf) printf("%s\n",buf);
-#else         //DOUBLEPRECISION
      printf("options.h=%lg\n", options.h);        
-#endif 
      printf("----------------\n");
-        
-     InitialData (&options,&u,&params,&system);                 
-     system.params.rpar=&params.rpar[0];
-     system.params.ipar=&params.ipar[0];
      
      for (i=0; i<system.neq; i++)
      {
@@ -102,13 +104,13 @@ int main()
 
      GaussCoefficients(DIR_TERM,&gsmethod,&options); 
      GaussCoefficients(DIR_TERM,&gsmethod2,&options2); 
+
      InitStat(&system,&gsmethod,&thestat);
-     print_u(system.neq, u.uu);
 
      wtime0= time(NULL);
      clock0= clock();
 
-     select_gauss(&gsmethod, &gsmethod2, &u, &u2,&system,
+     select_gauss(&gsmethod, &gsmethod2, &u, &u2, &system,
                   &options, &options2, &thestat, &thestat2);
   
      clock1=clock();
@@ -116,21 +118,30 @@ int main()
 
 /* --------- Results ---------------------------------------------------------*/
      printf("End execution \n");   
+
+
+    totmean=100;
+    if (thestat.stepcount>1)
+       for (is=0; is<gsmethod.ns; is++)
+       {
+            for (i=0; i<system.neq; i++) 
+            {
+                  initmean=(int)thestat.initqlty[is*system.neq+i]/(thestat.stepcount-1);
+                  if (initmean < totmean) totmean=initmean;
+            }               
+       }
+     else totmean=0;
+
+
+
      if (thestat.convergence==SUCCESS)
      {
            printf("Execution Correct\n");
            printf("convergence=%i.  (=0 correct;=-1 incorrect)\n",
                    thestat.convergence);        
 
-           print_u (system.neq,u.uu);
-#if PREC ==2  //QUADRUPLEPRECISION
-           printf("Max-DE");
-           n = quadmath_snprintf(buf, sizeof buf, 
-                                 "%+-#*.30Qe", width, thestat.MaxDE);
-           if ((size_t) n < sizeof buf) printf("%s\n",buf);
-#else  // DOUBLEPRECISION    
-           printf("Energy MaxDE=%.20lg\n",thestat.MaxDE);
-#endif                      
+           print_u (system.neq,u.uu); 
+           printf("Energy MaxDE=%.20lg\n",thestat.MaxDE);                     
 
            printf ("\nCPU time:%lg\n", 
                   (double) (clock1 - clock0)/CLOCKS_PER_SEC);
@@ -142,7 +153,7 @@ int main()
            printf("stepcount=%i\n",thestat.stepcount);
            printf("nout=%i\n",thestat.nout);
            
-           printf("fixed-point iterations=%i\n",thestat.totitcount);
+           printf("fixed-point iterations=%li\n",thestat.totitcount);
            printf("max fixed-point iterations=%i\n",thestat.maxitcount);        
            printf("deltaZero iterations=%i\n",thestat.itzero); 
  
@@ -165,6 +176,7 @@ int main()
     free(u2.uu); free(u2.ee);
 
     free(options.rtol); free(options.atol);
+    free(options2.rtol); free(options2.atol);
 
     free(gsmethod.m); 
     free(gsmethod.a);
@@ -178,6 +190,8 @@ int main()
     free(thestat.z); 
     free(thestat.li);
     free(thestat.fz);
+    free(thestat.initqlty);
+    free(thestat.zit0);
     
     exit(0);
 

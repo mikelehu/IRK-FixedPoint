@@ -117,7 +117,7 @@ FunT12[alpha_,t_]:=alpha*Sqrt[t];
 
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*MyFunctions-2*)
 
 

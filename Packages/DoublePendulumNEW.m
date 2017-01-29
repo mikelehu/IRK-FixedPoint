@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* ::Section:: *)
-(*Double Pendulum  Problem (NEW 13-12-2016) *)
+(*Double Pendulum  Problem *)
 
 
 BeginPackage["DoublePendulumNEW`"];
@@ -107,14 +107,14 @@ cos\[Theta]\[Phi]=Cos[\[Theta]+\[Phi]];
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Jacobian*)
 
 
 DoublePendulumJACNEW[t_,u_,parameters_List]:=
 Module[{c1,c2,c3,c4,c5,c6,c7,
          Q1,Q2,P1,P2,    
-P2P1,cosQ1,cosQ2,cos2Q2,cosQ1Q2,sinQ1,sinQ2,sin2Q2,sinQ1Q2,
+P2P1,cosQ1,cosQ2,cos2Q2,cosQ1Q2,sinQ2,sin2Q2,
 aux1,aux2,aux3,aux4,aux5,aux6,
 aux11,aux12,aux13,aux21,aux22,aux23,aux24,aux41,aux42,aux43,aux44,
 aux51,aux52,aux53,
@@ -140,10 +140,9 @@ cosQ1=Cos[Q1];
 cosQ2=Cos[Q2];
 cos2Q2=Cos[2 Q2];
 cosQ1Q2=Cos[Q1+Q2];
-sinQ1=Sin[Q1];
 sinQ2=Sin[Q2];
 sin2Q2=Sin[2 Q2];
-sinQ1Q2=Sin[Q1+Q2];
+
 
 aux1=c4-c5 cos2Q2;
 aux2=c3 cosQ2;
@@ -190,12 +189,26 @@ aux113=2c5 daux41 (aux53+aux52)sin2Q2;
 aux114=2sin2Q2 aux108;
 
 
-{{-aux3 -aux4,-aux4,0,0},
+(*{
+{0,-aux101,-aux102,-aux103},
+{0,aux101+aux104,-aux103,aux105},
+{-aux3 -aux4,-aux4,0,0},
 {-aux4,
 aux110+aux109-aux4-aux111-aux114,
 aux106 +aux112 ,aux107 +aux113 },
 {0,-aux101,-aux102,-aux103},
-{0,aux101+aux104,-aux103,aux105}}
+{0,aux101+aux104,-aux103,aux105}}*)
+
+{
+{0,-aux101,-aux102,-aux103},
+{0,aux101+aux104,-aux103,aux105},
+{-aux3 -aux4,-aux4,0,0},
+{-aux4,
+aux110+aux109-aux4-aux111-aux114,
+aux106 +aux112 ,aux107 +aux113 }
+}
+
+
 ];
 
 

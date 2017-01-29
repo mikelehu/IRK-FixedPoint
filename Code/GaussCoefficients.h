@@ -8,6 +8,4 @@ void GaussCoefficients
 (const char *path,gauss_method *method,const toptions *options
 );
 
-void GaussCoefficientsX
-(const char *path,gauss_method *method,const toptions *options
-);
+

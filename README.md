@@ -5,6 +5,7 @@ Content:
   Code:
 
         C-language implementation.
+        More information: Readme.txt
 
   Packages:
 
@@ -15,19 +16,19 @@ Content:
 
   CoefficientsData: 
 
-	Coefficients of Gauss-methods.
+	Coefficients of s=6 Gauss-methods.
 
   PerturbationsData:
 	
-	DoublePendulum(NonChaotic).
-	DoublePendulum(Chaotic).
-	Nbody (outer solar-system).
+	NCDP: DoublePendulum(NonChaotic).
+	CDP : DoublePendulum(Chaotic).
+	OSS : Outer solar-system.
 
-  Experiments:
+  Examples:
         
-	DoublePendulum(NonChaotic).
-	DoublePendulum(Chaotic).
-	Nbody (outer solar system).
+	NCDP: DoublePendulum(NonChaotic).
+	CDP : DoublePendulum(Chaotic).
+	OSS : Outer solar system.
 
 
 

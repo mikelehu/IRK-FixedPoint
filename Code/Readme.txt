@@ -14,12 +14,10 @@ CONTENTS:
 
    prec.c:		Precision.
    def.c:               Parameters and general definitions we use in the code.
-                        You must specify math-functions of you Odefun. 
+                        You must specify math-functions of your Odefun. 
 
    GaussTerminal.c:     An example to show how to call the numerical integration.
    math-Gauss.c:	An auxiliar file to call from mathematica (double precision). 
-   math-GaussPar.c:     An auxiliar file to call from mathematica (two integration in parallel).
-   quad-Gauss.c:	An auxiliar file to call from mathematica (quadruple precision).
 
    GaussInitData.c:     Contain "InitialData" with the initial values for some problems.
 
@@ -31,14 +29,13 @@ CONTENTS:
 	RKG2():		   Both primary and secondary sequential for round-off error estimation.
 	Fixed_point_it (): Fixed iteration method.	
 	It_Jacobi():	   Standard fixed point iteration.							
-	It_Seidel():	   Partitioned version of the fixed point iteration.
 	Yi_init();	   Initialization functions for Yi stages.
 											
 	TheOutput():	   Output function for RKG ().
 	TheOutput2():	   Output function for RKG-2 ().
 
 	NormalizedDistance(): Test of convergence of the iteration.
-	UpdateDMin ():      : Stopping criterion.
+	StopCriterion ():   : Stopping criterion.
 	RemoveDigitsFcn()   : Rounding a floating point number with p-r significant binary digits.				
 							
    GaussUserProblem.c:  Double pendulum and N-Body ode system:
@@ -49,8 +46,7 @@ CONTENTS:
 	Ham2()=HamNBody():
 
    math-Gauss.tm:	Mathlink file.
-   quad-Gauss.tm:	Mathlink file.
-   math-GaussPar.tm:	Mathlink file.				
+			
 
 *********************************************************************************
 OPTIONS:
@@ -62,9 +58,8 @@ OPTIONS:
 
    algorithm= You must specify one of the next implementations options:
 	=  1 Standard fixed point iteration method. 
-	= 11 Partitioned fixed point iteration method.
-	= 21 Both integrations execute sequentially (Jacobi).
-        = 22 Both integrations execute sequentially (Seidel).
+	=  2 Both integrations execute sequentially.
+
    
    h= stepsize.
    sampling: we sample the numerical results once every "sampling" steps.
@@ -81,15 +76,13 @@ PARAMETERS:
    You can specify next parameters:
 
    IOUT: default form (when we need intermedi values). 
-   PARALLEL: we want parallel execution.
+   PARALLEL: specify to run a parallel execution.
 
    MAXIT 50 :  maximum number of fixed point iterations 
    MAXKSW 10:  max number of steps to change second integration initialization mode.
-   RTOL,ATOL: fixed point iteration tolerance. 
+   RTOL,ATOL: fixed point iteration tolerances. 
    PREC:
        1=DOUBLEPRECISION
-       2=QUADRUPLEPRECISION
-       3=FLOAT.
 
    #define DIR_TERM :  // Path Coefficients for terminal executions  
    #define DIR_MATH :  // Path Coefficients for mathematica executions
@@ -101,7 +94,7 @@ RESULTS:
 
 ********************************************************************************
 INSTALATION:
-   Three options:
+   Two ways to execute :
 
      Terminal execution:
           make term-Gauss
@@ -109,26 +102,18 @@ INSTALATION:
 
       Mathematica (double)
           make math-Gauss
-          Execution from mathematica notebook.
+          Execution from mathematica notebook (see examples).
 
-      Mathematica (quadruple)
-          make quad-Gauss
-          Execution from mathematica notebook.
-
-      Mathematica (two integration in parallel for estimating error).
-          make math-GaussPar
-          Execution from mathematica notebook. 
 
 ********************************************************************************
 EXAMPLES:
-    RKGC_DoublePendulum-I.nb: Mathematica notebook integration of Double Pendulum problem (non-chaotic).
-    RKGC_DoublePendulum-II.nb: Mathematica notebook integration of Double Pendulum problem (chaotic).
-    RKGC_NBody.nb: Mathematica notebook integration of N9-Body problem.
+
+    NCDP: Mathematica notebook integration of Double Pendulum problem (non-chaotic).
+    CDP : Mathematica notebook integration of Double Pendulum problem (chaotic).
+    OSS : Mathematica notebook integration of Outer solar system problem.
 
 *********************************************************************************
-QUADRUPLE PRECISION:
-    We have used libquadmath GCC Quad-Precision Math Library.
-    https://gcc.gnu.org/onlinedocs/libquadmath/.
+
     
     
 

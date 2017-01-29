@@ -88,30 +88,4 @@ void Ode10
 val_type Ham10
 (const int neq,const solution *u, const parameters *params
 );
-/*------------------------------------------------------------------------------*/
-/*										*/
-/*	Ideal Integrator Funcions						*/
-/*										*/
-/*------------------------------------------------------------------------------*/
-
-void Ode11
-(const int neq,const val_type t,const val_type *u,
- val_type *f, const parameters *params
-);
-
-void Ode12
-(const int neq,const val_type t,const val_type *u,
- val_type *f, const parameters *params
-);
-
-void Ode14
-(const int neq,const val_type t,const val_type *u,
- val_type *f, const parameters *params
-);
-
-void Ode15
-(const int neq,const val_type t,const val_type *u,
- val_type *f, const parameters *params
-);
-
 

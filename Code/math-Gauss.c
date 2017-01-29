@@ -98,17 +98,8 @@ void mathGauss (int neq, int n, int ns, double t0, double tend,
     if (options.rdigits>0) options.mrdigits=pow(2,options.rdigits);
     if (options2.rdigits>0) options2.mrdigits=pow(2,options2.rdigits);
 
-    if (options.algorithm==308 || options.algorithm==318)
-    {
-          GaussCoefficientsX(DIR_MATH,&gsmethod,&options);
-          GaussCoefficientsX(DIR_MATH,&gsmethod2,&options2);
-    }
-    else 
-    {    
-          GaussCoefficients(DIR_MATH,&gsmethod,&options);
-          GaussCoefficients(DIR_MATH,&gsmethod2,&options2);
-    }
-
+    GaussCoefficients(DIR_MATH,&gsmethod,&options);
+    GaussCoefficients(DIR_MATH,&gsmethod2,&options2); 
 
     strncpy(thestat.filename, myfilename,STRMAX); 
     InitStat(&system,&gsmethod,&thestat);
@@ -147,8 +138,7 @@ void mathGauss (int neq, int n, int ns, double t0, double tend,
 
     switch (options.algorithm)
     {  
-    case 1: case 2:  case 11:  case 12:  case 301: case 308: case 309:
-    case 311: case 319: case 303: 
+    case 1:
 
           if (!MLPutFunction(stdlink, "List",14)) MLErrorMessage(stdlink);
           if (!MLPutReal64( stdlink,thestat.MaxDE)) MLErrorMessage(stdlink); 
@@ -181,10 +171,7 @@ void mathGauss (int neq, int n, int ns, double t0, double tend,
 
     break;
 
-
-
-    case 321: case 322: 
-
+    case 2: 
           aux[0]=thestat.totitcount;
           aux[1]=thestat2.totitcount;
 

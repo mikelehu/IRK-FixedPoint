@@ -18,10 +18,9 @@
 #include <mathlink.h>
 
 
-void print_u
-(const int neq,const val_type *u
+void print_u 
+(const int neq, const val_type *u
 );
-
 
 void InitStat
 (const ode_sys *system,const gauss_method *gsmethod, solver_stat *thestatptr
@@ -47,40 +46,14 @@ int Yi_init
 );
 
 
-void UpdateDMin
+void StopCriterion
 (const ode_sys *system, const gauss_method *method,
  int *D0,bool *cont,val_type *DMin,
  const val_type *Y, const val_type *Yold
 );
 
-
-void UpdateDMin_Classic
-(const ode_sys *system, const gauss_method *method,
- int *D0,bool *cont,val_type *DMin,
- const val_type *Y, const val_type *Yold
-);
-
-void UpdateDMin_SpId
-(const ode_sys *system, const gauss_method *method,
- int *D0,bool *cont,double *DMin,
- const val_type *Y, const val_type *Yold
-);
 
 void Fixed_point_it
-(const ode_sys *system, const  solution *u, 
- const val_type tn, const val_type h, 
- const toptions *options, const gauss_method *method,
- solver_stat *thestatptr
-);
-
-void Fixed_point_it_Classic
-(const ode_sys *system, const  solution *u, 
- const val_type tn, const val_type h, 
- const toptions *options, const gauss_method *method,
- solver_stat *thestatptr
-);
-
-void Fixed_point_it_SpId
 (const ode_sys *system, const  solution *u, 
  const val_type tn, const val_type h, 
  const toptions *options, const gauss_method *method,
@@ -92,20 +65,6 @@ int It_Jacobi
  const val_type h, const gauss_method *method,solver_stat *thestatptr
 );
 
-int It_Jacobi_Classic
-(const ode_sys *system, const solution *u, const val_type tn,
- const val_type h, const gauss_method *method,solver_stat *thestatptr
-);
-
-int It_Seidel
-(const ode_sys *system, const solution *u, const val_type tn,
- const val_type h, const gauss_method *method,solver_stat *thestatptr
-);
-
-int It_Seidel_Classic
-(const ode_sys *system, const solution *u, const val_type tn,
- const val_type h, const gauss_method *method,solver_stat *thestatptr
-);
 
 void TheOutput
 (const ode_sys *system, const gauss_method *method,
@@ -129,22 +88,8 @@ void CompensatedSummation
  const solver_stat *thestatptr
 );
 
-void CompensatedSummationClassic		//30-11-2016 
-(const gauss_method *gsmethod,
- val_type *u0,solution *u,
- const ode_sys *system, const toptions *options,
- const solver_stat *thestatptr
-);
-
 
 void RKG 
-(const gauss_method *gsmethod,
- solution *u,
- const ode_sys *system, toptions *options,
- void RKG_Step (), solver_stat *thestatptr
-);
-
-void RKGClassic					//30-11-2016 
 (const gauss_method *gsmethod,
  solution *u,
  const ode_sys *system, toptions *options,
