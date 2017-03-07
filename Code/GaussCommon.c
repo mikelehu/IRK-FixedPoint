@@ -410,7 +410,7 @@ void Fixed_point_it ( const ode_sys *system, const solution *u,
      z=thestatptr->z;   
 
      iter0=true;
-  
+     D0=0;
      for (is=0; is<ns; is++)
           for (i=0; i<neq; i++) DMin[is*neq+i]=INF; 
 
