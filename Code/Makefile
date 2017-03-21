@@ -2,6 +2,8 @@
 # make : 01-10-2016 
 #
 # Description: Makefile for compiling IRK-Fixed-Point project.
+# System: Ubuntu 16.04 lts (64 bits)
+#
 #
 
 
@@ -16,20 +18,12 @@ MPREP = $(MATHLINKPATH)/mprep
 # Compiler options.
 LIBFLAGS=-L$(MATHLINKPATH)
 
-ifeq ($(FMA),NO)
-  FLAGS=-I$(MATHLINKPATH) -O2 -Wall -std=c99 -fno-common
-else
-  FLAGS=-I$(MATHLINKPATH) -O2 -Wall -std=c99 -fno-common -mfma 
-endif  
-
-FLAGS=-I$(MATHLINKPATH) -O2 -Wall -std=c99 -fno-common
+FLAGS=-I$(MATHLINKPATH) -O2 -Wall -std=c99 -fno-common -mfma
 OMP_FLAGS=-fopenmp
 
 # Objects
 OBJECTS = GaussTerminal.o GaussInitData.o GaussCommon.o GaussUserProblem.o GaussCoefficients.o 
 REALOBJECTS = math-Gausstm.o math-Gauss.o GaussCommon.o GaussUserProblem.o GaussCoefficients.o 
-OBJECTS3 = math-GaussParatm.o math-GaussPar.o GaussCommon.o GaussUserProblem.o  GaussCoefficients.o 
-
 
 .PHONY: clean help 
 

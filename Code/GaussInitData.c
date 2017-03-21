@@ -6,7 +6,7 @@
 /*         Initial values:						      */
 /*		1:  Double-Pendulum non-Chaotic.			      */
 /*		2:  Double-Pendulum Chaotic.				      */
-/*		3: Outer-Solar-System).				      */
+/*		3:  Outer-Solar-System).				      */
 /* ---------------------------------------------------------------------------*/
 
 

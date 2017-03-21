@@ -21,7 +21,7 @@
 #define INF DBL_MAX
 #define MAXNEQ	200		// Maximum neq.
 #define MAXPARAM 30		// Number of maximum parameters.
-#define MAXIT 50		// Maximum number of fixed point iterations 
+#define MAXIT 100		// Maximum number of fixed point iterations 
 #define MAXKSW 10               // Max number of steps to change second 
                                 // integration initialization mode.
 #define SUCCESS 0

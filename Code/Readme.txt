@@ -4,7 +4,7 @@ Readme.txt
      Gauss Implicit Runge-Kutta implementation. 
      Fixed-Point iteration.
 
-     version: 1 (01-01-2017).
+     version: 1.1 (21-03-2017).
 
      Article: "Reducing and monitoring round-off error propagation for sympletic
                implicit Runge-Kutta schemes" (2017). 
@@ -34,7 +34,7 @@ CONTENTS:
 	TheOutput():	   Output function for RKG ().
 	TheOutput2():	   Output function for RKG-2 ().
 
-	NormalizedDistance(): Test of convergence of the iteration.
+	NormalizedDistance(): check of convergence of the iteration.
 	StopCriterion ():   : Stopping criterion.
 	RemoveDigitsFcn()   : Rounding a floating point number with p-r significant binary digits.				
 							
@@ -71,11 +71,11 @@ OPTIONS:
          initialized with initial values.
 
 *********************************************************************************
-PARAMETERS:
+PARAMETERS (file: def.h):
 
    You can specify next parameters:
 
-   IOUT: default form (when we need intermedi values). 
+   IOUT: default form (enable otuput binary file). 
    PARALLEL: specify to run a parallel execution.
 
    MAXIT 50 :  maximum number of fixed point iterations 
@@ -93,7 +93,8 @@ RESULTS:
    filename (output binary format).
 
 ********************************************************************************
-INSTALATION:
+INSTALATION (Ubuntu 16.04 lts):
+
    Two ways to execute :
 
      Terminal execution:
