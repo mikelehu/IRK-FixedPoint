@@ -13,7 +13,7 @@
 
 
 void GaussCoefficients
-(const char *path, gauss_method *method, const toptions *options)
+(const char *path, gauss_method *method,  val_type h)
 
 {
      int i,j;
@@ -159,18 +159,18 @@ void GaussCoefficients
      sum=0.;
      for (i=1; i<ns-1; i++)
      {
-        method->hb[i]=(options->h)*method->b[i];
+        method->hb[i]=h*method->b[i];
         sum+=method->hb[i];
      }
      
-     method->hb[0]=((options->h)-sum)/2.;
-     method->hb[ns-1]=((options->h)-sum)/2.;
+     method->hb[0]=(h-sum)/2.;
+     method->hb[ns-1]=(h-sum)/2.;
 
 /*---- Calculate hc coefficients -----------------------------------------------*/
 
      for (i=0; i<ns; i++)
      {
-        method->hc[i]=(options->h)*method->c[i];
+        method->hc[i]=h*method->c[i];
      }
 
      fclose(fileM);

@@ -18,7 +18,6 @@
 #include <ctype.h>
 #include <math.h>
 #include <def.h>
-#include <quadmath.h>
 
 
 /*------------------------------------------------------------------------------*/

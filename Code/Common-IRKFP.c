@@ -3,25 +3,24 @@
 /*    GaussCommon.c							      */
 /*									      */
 /*	Functions: 							      */
+/*       print_u():							      */
 /*	 InitStat():							      */
 /*	 NormalizedDistance():						      */
-/*       statYinit():							      */
-/*	 RemoveDigitsFcn():						      */
-/*	 Yi_init();							      */
+/*       StatYinit():							      */
+/*	 RemoveDigits():						      */
+/*	 Default_Stage_init();						      */
+/*	 Interpolated_Stage_init();					      */
 /*	 StopCriterion();						      */
-/*	 Fixed_point_it():						      */
-/*	 It_Jacobi():							      */
-/*	 TheOutput():							      */
-/*	 TheOutput2():							      */
-/*	 RKG():								      */
-/*	 RKG2():							      */
+/*	 Fixed_point_Step():						      */
+/*	 General_FP_It():						      */
+/*	 Partitioned_FP_It():						      */
+/*	 MyOutput():							      */
 /*	 CompensatedSummation():					      */
-/*       select_gauss();						      */
-/*       select_odefun();						      */
+/*	 IRKFP():							      */
+/*       								      */
 /* ---------------------------------------------------------------------------*/
 
-#include <GaussCommon.h>
-#include <quadmath.h>
+#include <Common-IRKFP.h>
 #include <float.h> 
 
 /******************************************************************************/
@@ -150,12 +149,12 @@ val_type NormalizedDistance ( const int neq, const int ns,
 
 /******************************************************************************/
 /* 					   				      */
-/* statzinit: 		         	  				      */
+/* StatYinit: 		         	  				      */
 /*                                        				      */
 /*									      */
 /******************************************************************************/
 
-int statYinit (const ode_sys *system,const gauss_method *method,
+int StatYinit (const ode_sys *system,const gauss_method *method,
                solver_stat *thestatptr)
 {
 
@@ -200,12 +199,12 @@ int statYinit (const ode_sys *system,const gauss_method *method,
 
 /******************************************************************************/
 /* 					   				      */
-/* RemoveDigitsFcn	         	  				      */
+/* RemoveDigits		         	  				      */
 /*                                        				      */
 /*									      */
 /******************************************************************************/
 
-void RemoveDigitsFcn (val_type *x,const int m)
+void RemoveDigits (val_type *x,const int m)
 {
 
 /* ---------- First initializations ------------------------------------------*/
@@ -227,12 +226,53 @@ void RemoveDigitsFcn (val_type *x,const int m)
 
 /******************************************************************************/
 /* 					   				      */
-/* Yi_init: 		         	  				      */
+/* Default_Stage_init:	         	  				      */
 /*                                        				      */
 /*									      */
 /******************************************************************************/
 
-int Yi_init (const solution *u,  val_type *z, const ode_sys *system,
+void Default_Stage_init (const solution *u,  val_type *z, const ode_sys *system,
+             const gauss_method *method,solver_stat *thestatptr,
+             const toptions *options)
+{
+
+
+/* ---------- First initializations ------------------------------------------*/
+
+     int neq,ns;
+
+     neq=system->neq;
+     ns=method->ns;
+
+/*------------- declarations -------------------------------------------------*/ 
+
+     int i,is;
+     val_type *zit0;
+
+/* ----------- implementation  -----------------------------------------------*/
+       
+
+          zit0=thestatptr->zit0;
+          for (is = 0; is<ns; is++)
+               for (i = 0; i<neq; i++)
+               {
+                    z[is*neq+i]=u->uu[i];
+                    zit0[is*neq+i]=u->uu[i];   
+               }
+    
+ 
+     return;
+
+}
+
+/******************************************************************************/
+/* 					   				      */
+/* Interpolated_Stage_init:         	  				      */
+/*                                        				      */
+/*									      */
+/******************************************************************************/
+
+void Interpolated_Stage_init (const solution *u,  val_type *z, const ode_sys *system,
              const gauss_method *method,solver_stat *thestatptr,
              const toptions *options)
 {
@@ -252,23 +292,7 @@ int Yi_init (const solution *u,  val_type *z, const ode_sys *system,
      val_type sum;
 
 /* ----------- implementation  -----------------------------------------------*/
-
- 
-     switch (options->approximation)
-     {
-
-     case 0:           
-
-          zit0=thestatptr->zit0;
-          for (is = 0; is<ns; is++)
-               for (i = 0; i<neq; i++)
-               {
-                    z[is*neq+i]=u->uu[i];
-                    zit0[is*neq+i]=u->uu[i];   
-               }
-     break;
-
-     case 1:          
+        
    
           li=thestatptr->li;
           zit0=thestatptr->zit0;
@@ -292,18 +316,10 @@ int Yi_init (const solution *u,  val_type *z, const ode_sys *system,
                      
                 }
           }  
-     break;
-          
-     default:
-          printf("approximation=%i error\n", options->approximation);
-     break;
-
-     }
  
-     return(0);
+     return;
 
 }
-
 
 
 /******************************************************************************/
@@ -376,13 +392,13 @@ void StopCriterion    (const ode_sys *system, const gauss_method *method,
 
 /******************************************************************************/
 /* 									      */
-/*   Fixed_point_it  							      */
+/*   Fixed_point_Step  							      */
 /* 									      */
 /* 									      */
 /******************************************************************************/
 
 
-void Fixed_point_it ( const ode_sys *system, const solution *u, 
+void Fixed_point_Step ( const ode_sys *system, const solution *u, 
                       const val_type tn, const val_type h, 
                       const toptions *options, const gauss_method *method,
                       solver_stat *thestatptr)
@@ -422,7 +438,7 @@ void Fixed_point_it ( const ode_sys *system, const solution *u,
            for (is=0; is<ns;is++)
                 for (i=0; i<neq; i++) zold[neq*is+i]=thestatptr->z[neq*is+i];
 
-           options->iteration[0](system,u,tn,h,method,thestatptr); 
+           options->iteration(system,u,tn,h,method,thestatptr); 
            StopCriterion(system,method,&D0,&iter0,DMin,z,zold);
            thestatptr->itcount++;
      }
@@ -458,14 +474,14 @@ void Fixed_point_it ( const ode_sys *system, const solution *u,
 
 /******************************************************************************/
 /*									      */
-/*      It_Jacobi							      */
+/*      General_FP_It: General Fixed Point Iteration			      */
 /*									      */
 /******************************************************************************/
 
 
-int It_Jacobi (const ode_sys *system, const solution *u, const val_type tn,
-               const val_type h, const gauss_method *method,
-               solver_stat *thestatptr)
+int General_FP_It (const ode_sys *system, const solution *u, const val_type tn,
+                   const val_type h, const gauss_method *method,
+                   solver_stat *thestatptr)
 {
 
      int extern thread_count;
@@ -522,16 +538,118 @@ int It_Jacobi (const ode_sys *system, const solution *u, const val_type tn,
 
 }	
 
+/******************************************************************************/
+/*									      */
+/*      Partitioned_FP_It: Partitioned Fixed Point Iteration		      */
+/*									      */
+/******************************************************************************/
+
+int Partitioned_FP_It
+(const ode_sys *system, const solution *u, const val_type tn,
+ const val_type h, const gauss_method *method,
+ solver_stat *thestatptr)
+
+{
+
+     int extern thread_count;
+
+/* ---------- First initializations ------------------------------------------*/
+
+     int neq,ns;
+     parameters *params;
+     val_type *z,*li,*fz;
+    
+     neq=system->neq;
+     ns=method->ns;
+     params=&system->params;
+
+     z=thestatptr->z;
+     li=thestatptr->li;
+     fz=thestatptr->fz;
+
+/*------ declarations --------------------------------------------------------*/
+
+     int i,is,js,isn,in,jsn;
+     val_type sum;
+  
+/* ----------- implementation  -----------------------------------------------*/ 
+
+
+/* ----------- first part  ---------------------------------------------------*/ 
+#ifdef PARALLEL
+#      pragma omp parallel for num_threads(thread_count) private(isn)
+#endif  
+     for (is = 0; is<ns; is++)
+     {
+           isn=neq*is;
+           params->eval=system->cod[0];
+           thestatptr->fcn++;
+           system->f(neq,tn+method->hc[is],&z[isn],&fz[isn],params);
+           for (i=0; i<neq/2; i++) li[isn+i]=fz[isn+i]*method->hb[is];	
+     }
+
+     for (is = 0; is<ns; is++)
+     { 
+           for (i = 0; i<neq/2; i++)    
+           {  
+                 in=neq*is+i; 
+                 sum=method->m[ns*is]*li[i]+u->ee[i];
+                         
+                 for (js =1; js<ns; js++)
+                 {
+                       jsn=ns*is+js;
+                       sum+=method->m[jsn]*li[neq*js+i];
+                 }
+
+                 z[in]=u->uu[i]+sum;        
+           }
+     } 
+
+
+/* ----------- second part  --------------------------------------------------*/ 
+
+#ifdef PARALLEL
+#      pragma omp parallel for num_threads(thread_count) private(isn)
+#endif  
+     for (is = 0; is<ns; is++)
+     {
+           isn=neq*is;
+           params->eval=system->cod[1];
+           system->f(neq,tn+method->hc[is],&z[isn],&fz[isn],params);
+           for (i=neq/2; i<neq; i++) li[isn+i]=fz[isn+i]*method->hb[is];		
+      }
+
+     for (is = 0; is<ns; is++)
+     { 
+           for (i=neq/2; i<neq; i++)    
+           {  
+                 in=neq*is+i; 
+                 sum=method->m[ns*is]*li[i]+u->ee[i];
+                         
+                 for (js =1; js<ns; js++)
+                 {
+                       jsn=ns*is+js;
+                       sum+=method->m[jsn]*li[neq*js+i];
+                 }
+
+                 z[in]=u->uu[i]+sum;        
+            }
+     } 
+    
+     return(0);
+
+}	
+
 
 
 /******************************************************************************/
 /*									      */
-/*      TheOutput (RKG)							      */
+/*      MyOutput 							      */
 /*									      */
 /******************************************************************************/
  
-void TheOutput(const ode_sys *system,const gauss_method *method,
-               const val_type t, const solution *u,
+void MyOutput(const ode_sys *system,const gauss_method *method,
+               const val_type t, val_type h, const solution *u, 
                solver_stat *thestatptr,
                const parameters *params,const toptions *options,FILE *myfile)
 {
@@ -576,71 +694,9 @@ void TheOutput(const ode_sys *system,const gauss_method *method,
   
      } 
 
-     if (thestatptr->stepcount>1) statYinit(system,method,thestatptr);
+     if (thestatptr->stepcount>1) StatYinit(system,method,thestatptr);
 
   return;
-
-}
-
-/******************************************************************************/
-/*									      */
-/*      TheOutput2 (RKG2)						      */
-/*									      */
-/******************************************************************************/
-
-void TheOutput2(const ode_sys *system, const gauss_method *method,
-                const val_type t, const solution *u,
-                const solution *u2,solver_stat *thestatptr,
-                const parameters *params, const toptions *options,FILE *myfile)
-{
-
-/* ---------- First initializations ------------------------------------------*/
-
-     int neq;
-     neq=system->neq;
-
-/*------ declarations --------------------------------------------------------*/
-
-     val_type DH;
-     int i,node;
-  
-     struct rec
-     {
-     val_type t;
-     val_type uu[neq];
-     val_type ee[neq];
-     val_type est[neq];
-     };
-  
-     struct rec my_record;
-
-
-/* ----------- implementation  -----------------------------------------------*/ 
-
-     node=neq;
-     DH=(system->ham(node,u,params)-thestatptr->E0)/thestatptr->E0;
-     if (FABS(DH)>thestatptr->MaxDE) thestatptr->MaxDE=FABS(DH);
-
-     if (((thestatptr->stepcount % options->sampling) == 0) || (thestatptr->laststep))
-     {
-           thestatptr->nout++;
-           printf("%i,%i, %lg\n",thestatptr->stepcount,thestatptr->itcount,DH);
-
-     my_record.t=t;
-
-     for (i=0; i<neq;i++) 
-     {
-           my_record.uu[i]=u->uu[i];
-           my_record.ee[i]=u->ee[i];
-           my_record.est[i]=(u->uu[i]-u2->uu[i])+(u->ee[i]-u2->ee[i]);}
-           fwrite(&my_record, sizeof(struct rec), 1, myfile);  
-
-     } 
-
-
-     if (thestatptr->stepcount>1) statYinit(system,method,thestatptr);
-
-     return;
 
 }
 
@@ -653,7 +709,7 @@ void TheOutput2(const ode_sys *system, const gauss_method *method,
 /******************************************************************************/
 
 void CompensatedSummation (const gauss_method *gsmethod,
-                           val_type *u0,solution *u,const ode_sys *system,
+                           solution *u,const ode_sys *system,
                            const toptions *options,const solver_stat *thestatptr)
 
 {
@@ -702,7 +758,6 @@ void CompensatedSummation (const gauss_method *gsmethod,
           for (i = 0; i<neq; i++)
           { 
 
-               u0[i]=u->uu[i];
                s0=u->uu[i];
                ee=u->ee[i];
 		
@@ -712,7 +767,7 @@ void CompensatedSummation (const gauss_method *gsmethod,
                     isn=neq*is+i;                
                     delta=li[isn]+ee;
                     if (options->rdigits>0) 
-                        RemoveDigitsFcn(&delta,options->mrdigits);
+                        RemoveDigits(&delta,options->mrdigits);
                     s1=s0;
                     s0=s1+delta;
                     aux=s1-s0;
@@ -733,15 +788,16 @@ void CompensatedSummation (const gauss_method *gsmethod,
 
 /******************************************************************************/
 /* 									      */
-/*   RGK:  								      */
+/*   IRKFP  								      */
 /* 									      */
 /* 									      */
 /******************************************************************************/
 
-void RKG
-(const gauss_method *gsmethod, solution *u,
+void IRKFP
+(val_type t0, val_type t1, val_type h,
+ const gauss_method *gsmethod, solution *u,
  const ode_sys *system, toptions *options,
- void RKG_Step (), solver_stat *thestatptr)
+ solver_stat *thestatptr)
 
 {
 
@@ -758,7 +814,6 @@ void RKG
      FILE *myfile;
   
      int istep,nstep;
-     val_type u0[neq];
      val_type tn;             
      val_type *z;
 
@@ -766,24 +821,24 @@ void RKG
 
 /* ----------- implementation  -----------------------------------------------*/ 
 
-     myfile = fopen(thestatptr->filename,"wb"); 
+     if (options->TheOutput != 0)
+           myfile = fopen(options->filename,"wb"); 
 
 /* ----------- initial energi (E0)   -----------------------------------------*/
 
      thestatptr->E0=system->ham(neq,u,params);
      printf("Initial energy=%lg\n", thestatptr->E0);
 
-     tn=options->t0;
-     nstep=((options->t1)-(options->t0))/(options->h); 
+     tn=t0;
+     nstep=(t1-t0)/h; 
 
-#ifdef IOUT
-     TheOutput(system,gsmethod,tn,u,thestatptr,params,options,myfile);
-#endif 
+     if (options->TheOutput != 0)
+          options->TheOutput(system,gsmethod,tn,h,u,thestatptr,params,options,myfile);
 
      for(istep=0; istep<nstep; istep++) 
      {     
-          Yi_init (u,z,system,gsmethod,thestatptr,options);      
-          RKG_Step (system,u,tn,options->h,options,gsmethod,thestatptr);
+          options->StageInitFn (u,z,system,gsmethod,thestatptr,options);      
+          Fixed_point_Step (system,u,tn,h,options,gsmethod,thestatptr);
           if (thestatptr->convergence==FAIL)
           { 
                printf("Stop Fail. step=%i\n", istep);
@@ -791,341 +846,35 @@ void RKG
           } 	      
           else
           {
-               CompensatedSummation (gsmethod,u0,u,system,options,thestatptr);
+               CompensatedSummation (gsmethod,u,system,options,thestatptr);
 
-               tn=(istep+1)*(options->h);
+               tn=(istep+1)*h;
 
                thestatptr->stepcount++;		
                (thestatptr->totitcount)+=(thestatptr->itcount); 
                if ((thestatptr->itcount)>(thestatptr->maxitcount))
                   (thestatptr->maxitcount)=(thestatptr->itcount);
 
-#ifdef IOUT
-               TheOutput(system,gsmethod,tn,u,thestatptr,params,options,myfile);
-#endif 
+               if (options->TheOutput != 0)
+                   options->TheOutput(system,gsmethod,tn,h,u,thestatptr,params,options,myfile);
 
-
-               if ((tn+options->h)>=options->t1)
+               if (tn+h>=t1)
                { 
-                    options->h=options->t1-tn;
+                    h=t1-tn;
                     thestatptr->laststep=true;
                } 
           }
      }
 
-
-     fclose(myfile);
+     if (options->TheOutput != 0) fclose(myfile);
      return;
 
 }
 
 
-/******************************************************************************/
-/* 								       	      */
-/*   RKG2:  double integration (sequentially).  			      */
-/*        								      */
-/* 									      */
-/******************************************************************************/
 
-void RKG2 
-(const gauss_method *gsmethod, const gauss_method *gsmethod2,
- solution *u,solution *u2,
- const ode_sys *system, toptions *options, toptions *options2,
- void RKG_Step (), solver_stat *thestatptr,solver_stat *thestatptr2)
- 
-{
 
-/* ---------- First initializations ------------------------------------------*/
 
-     int neq,ns;
-     parameters *params;
 
-     neq=system->neq;
-     ns=gsmethod->ns;
-     params=&system->params;
-
-/*------ declarations --------------------------------------------------------*/
-
-     FILE *myfile;
-  
-     int i,is,ksw;
-     int istep,nstep;
-     val_type tn;             
-
-     val_type u0[neq];  
-     val_type *z,*z2;
-     bool initwithfirstintegration;         
-
-     z=thestatptr->z;
-     z2=thestatptr2->z;
-
-
-/* ----------- implementation  -----------------------------------------------*/ 
-
-     myfile = fopen(thestatptr->filename,"wb"); 
-
-/* ----------- initial energi (E0)   -----------------------------------------*/
-
-     thestatptr->E0=system->ham(neq,u,params);
-     printf("Initial energy=%lg\n", thestatptr->E0);
- 
-     tn=options->t0;
-     nstep=((options->t1)-(options->t0))/(options->h);
-     if (nstep*(options->h)+(options->t0)<options->t1) 
-           nstep++;    
-  
-     initwithfirstintegration=true;
-     ksw=0;
-
-
-#ifdef IOUT
-     TheOutput2(system,gsmethod,tn,u,u2,thestatptr,params,options,myfile);
-#endif 
-
-     for(istep=0; istep<nstep; istep++) 
-     {     
-
-          /* ---------------- First integration ------------------------------*/
-
-          Yi_init (u,z,system,gsmethod,thestatptr,options);   
-          RKG_Step (system,u,tn,options->h,options,gsmethod,thestatptr);
- 
-          switch (thestatptr->convergence)  
-          {
-          case FAIL:
-               printf("Stop Fail. step=%i\n", istep);
-               nstep=istep;
-          break;
-
-          default: 	
-               CompensatedSummation (gsmethod,u0,u,system,options,thestatptr);
-
-          /* ---------------- Second integration -----------------------------*/
-
-               if (initwithfirstintegration==false)
-               {
-                     Yi_init (u2,z2,system,gsmethod2,thestatptr2,options2);
-               }  
-               else
-               {    for (is=0; is<ns; is++)
-                         for (i=0; i<neq; i++)
-                             {z2[is*neq+i]=z[is*neq+i]+(u2->uu[i]-u0[i]);}
-               }
-
-               RKG_Step (system,u2,tn,options2->h,options2,gsmethod2,thestatptr2);
-          
-               switch (thestatptr2->convergence)
-               { 
-               case FAIL:
-                    printf("Stop Fail. step=%i\n", istep);
-                    nstep=istep;
-               break;
-    
-               default:
-                    CompensatedSummation (gsmethod2,u0,u2,system,options2,thestatptr2);
-
-                    if (NormalizedDistance(neq,1,options,u->uu,u2->uu)>ESTERRTHRS)     
-                    { 
-                          printf("Stop integration. Estimated error is high=%i\n", istep);
-                          nstep=istep;
-                    };
-     
-                    if (initwithfirstintegration==true)
-                    {
-                           if ((thestatptr2->itcount) > thestatptr->itcount)
-                           {
-                                 ksw++;
-                                 if (ksw>MAXKSW) {initwithfirstintegration=false;}
-                           }
-                           else
-                           {
-                                 ksw=0;
-                           }
-                    }
-
-                    tn=(istep+1)*(options->h);
-
-                    thestatptr->stepcount++;		
-                    (thestatptr->totitcount)+=(thestatptr->itcount); 
-                    if ((thestatptr->itcount)>(thestatptr->maxitcount))
-                       {(thestatptr->maxitcount)=(thestatptr->itcount);}
-
-                    thestatptr2->stepcount++;		
-                    (thestatptr2->totitcount)+=(thestatptr2->itcount); 
-                    if ((thestatptr2->itcount)>(thestatptr2->maxitcount))
-                       {(thestatptr2->maxitcount)=(thestatptr2->itcount);}
-
-#ifdef IOUT
-                    TheOutput2(system,gsmethod,tn,u,u2,thestatptr,params,options,myfile);
-#endif 
-
-                    if ((tn+options->h)>=options->t1)
-                    { 
-                          options->h=options->t1-tn;
-                          thestatptr->laststep=true;
-                    } 
-
-               break;
-               } 
-
-          break;
-          }
-      }
-
-      fclose(myfile);
-
-      return;
-
-}
-
-
-
-/******************************************************************************/
-/* 									      */
-/*   select_gauss				 			      */
-/*        								      */
-/* 									      */
-/******************************************************************************/
-
-void select_gauss
-(gauss_method *gsmethodptr, gauss_method *gsmethod2ptr,
- solution *uptr,solution *u2ptr,
- ode_sys *systemptr,toptions *optionsptr,toptions *options2ptr,
- solver_stat *thestatptr,solver_stat *thestat2ptr)
-
-{
-
-/* ---------- First initializations ------------------------------------------*/
-
-
-/*------ declarations --------------------------------------------------------*/
-
-    int i;
-
-
-/* ----------- implementation  -----------------------------------------------*/
-
-    switch (optionsptr->algorithm)
-    {  
-
-   /* RKG: gure inplementazioa */
-
-    case  1:  /* Standard fixed point iteration */
-          optionsptr->iteration[0]=It_Jacobi;
-          systemptr->cod[0]=0;
-          RKG (gsmethodptr,uptr,systemptr,optionsptr,Fixed_point_it,thestatptr);                             
-    break;  
-
-    case  2: /* RKG2: sequential execution */
-          options2ptr->t0=optionsptr->t0;
-  	  options2ptr->t1=optionsptr->t1;
- 	  options2ptr->h=optionsptr->h;
- 	  options2ptr->algorithm=optionsptr->algorithm;
- 	  options2ptr->sampling=optionsptr->sampling;
- 	  options2ptr->approximation=optionsptr->approximation;
-
-          for (i=0; i<systemptr->neq; i++)
-          {
-               options2ptr->rtol[i]=optionsptr->rtol[i];
-               options2ptr->atol[i]=optionsptr->atol[i];
-          }
-
-          
-          for (i=0; i<systemptr->neq;i++)
-   	  {
-                u2ptr->uu[i]=uptr->uu[i];
-    		u2ptr->ee[i]=uptr->ee[i];					
-          }
-
-          optionsptr->iteration[0]=It_Jacobi;
-          options2ptr->iteration[0]=It_Jacobi;
-          systemptr->cod[0]=0;
-          gsmethod2ptr->ns=gsmethodptr->ns;
-
- 	  InitStat(systemptr,gsmethod2ptr,thestat2ptr);
-          RKG2 (gsmethodptr,gsmethod2ptr,uptr,u2ptr,systemptr,optionsptr,options2ptr,
-                Fixed_point_it,thestatptr,thestat2ptr);  
-
-    break;
-
-                                  
-    default:
-          printf("Error: incorrect algorithm\n");
-    break;
-
-         
-    } 
-}
-
-/******************************************************************************/
-/* 									      */
-/*   select_odefun				 			      */
-/*        								      */
-/* 									      */
-/******************************************************************************/
-
-void select_odefun (const int codfun, ode_sys *system)
-{
-     switch (codfun)
-     { 
-     case 1: 
-           system->f = Ode1;
-           system->ham= Ham1;                   
-     break;
-
-     case 2: 
-           system->f = Ode2;
-           system->ham= Ham2;
-     break;
-
-     case 3: 
-           system->f = Ode3;
-           system->ham= Ham3;               
-     break;
-
-     case 4: 
-           system->f = Ode4;
-           system->ham= Ham4;                  
-     break;
-
-     case 5: 
-           system->f = Ode5;
-           system->ham= Ham5;               
-     break;
-
-     case 6: 
-           system->f = Ode6;
-           system->ham= Ham6;               
-     break;
-
-     case 7: 
-           system->f = Ode7;
-           system->ham= Ham7;                   
-     break;
-
-     case 8: 
-           system->f = Ode8;
-           system->ham= Ham8;                  
-     break;
-
-     case 9: 
-           system->f = Ode9;
-           system->ham= Ham9;                 
-     break;
-
-     case 10: 
-           system->f = Ode10;
-           system->ham= Ham10;                   
-     break;
-
-
-     default:
-           printf("error. codfun\n");
-     break;
-     
-     }
-
-     return;
-}
 
 

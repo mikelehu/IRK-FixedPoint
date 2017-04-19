@@ -12,77 +12,88 @@ Readme.txt
 ********************************************************************************
 CONTENTS:
 
-   prec.c:		Precision.
    def.c:               Parameters and general definitions we use in the code.
                         You must specify math-functions of your Odefun. 
 
-   GaussTerminal.c:     An example to show how to call the numerical integration.
-   math-Gauss.c:	An auxiliar file to call from mathematica (double precision). 
+   Terminal-IRKFP.c:    An example to show how to run an integration from the Unix terminal.
+   math-IRKFP.c:	An example to show how to run an integration from mathematica. 
 
-   GaussInitData.c:     Contain "InitialData" with the initial values for some problems.
+   GaussCoefficients.c: Function to load Butcher tableau of the Implicit Runge-Kutta method and 
+                        the coefficients of the  reformulation as explained in the article.
+                        We offer Gauss method coefficients for s=6, s=8, s=16.
 
-   GaussCoefficients.c: Coefficients mij,bi,ci that define Inplicit Runge-Kutta method.
+   Common-IRKFP.c:      Numerical integration method. We will find these functions:
 
-   GaussCommon.c:       Numerical integration method. We will find these functions:
-
-	RKG () : 	   IRK method.
-	RKG2():		   Both primary and secondary sequential for round-off error estimation.
-	Fixed_point_it (): Fixed iteration method.	
-	It_Jacobi():	   Standard fixed point iteration.							
-	Yi_init();	   Initialization functions for Yi stages.
+	IRKFP () : 	         IRK Fixed-Point integration (main function).
+	Fixed_point_Step ():     Fixed iteration Step.	
+	General_FP_It():         General fixed point iteration.	
+	Partitioned_FP_It():     Partitioned fixed point iteration.		
+        Default_Stage_init:      Initialization of Stages, Y_{n,i}=y_n	
+        Interpolated_Stage_init	 Initialization of stages, Y_{n,i}=G(Y_{n-1,i})		
 											
-	TheOutput():	   Output function for RKG ().
-	TheOutput2():	   Output function for RKG-2 ().
+	MyOutput():	         An output function defined by the user.
 
-	NormalizedDistance(): check of convergence of the iteration.
-	StopCriterion ():   : Stopping criterion.
-	RemoveDigitsFcn()   : Rounding a floating point number with p-r significant binary digits.				
+	NormalizedDistance():    Check convergence of the iteration.
+	StopCriterion ():        Stopping criterion.
+	RemoveDigits():          Rounding a floating point number with p-r significant binary digits.
+        CompensatedSummation():  Function to compute y_{n+1}=y_{n}+ sum_{i} L_{n,i}				
 							
-   GaussUserProblem.c:  Double pendulum and N-Body ode system:
+   Problems.c:  Examples of ODE systems and Hamiltonians: Double pendulum and N-Body problems.
 														
 	Ode1()=OdePendulum():	
 	Ham1()=HamPendulum():	
 	Ode2()=OdeNBody():
 	Ham2()=HamNBody():
 
-   math-Gauss.tm:	Mathlink file.
+   math-IRKFP.tm:		 Mathlink file.
 			
 
 *********************************************************************************
-OPTIONS:
+ARGUMENTS:
 
    You will have to specify next options for the numerical integration:
+     IRKFP (t0,t1,h, &gsmethod, &u, &system, &options, &thestat);
+      
+       t0,t1: interval of numerical integration.
+       h:     stepsize.
 
-   ns= number of stages of Inplicit Runge-Kutta method.
-   eda= name of differential equation.
+       gsmethod->ns: number of stages of Implicit Runge-Kutta Gauss collocation method.
+       gsmethod->m, hc, hb: coefficients that define Implicit Runge-Kutta method.
+       hsmethod->nu: interpolation coefficients to initialize stages.
 
-   algorithm= You must specify one of the next implementations options:
-	=  1 Standard fixed point iteration method. 
-	=  2 Both integrations execute sequentially.
+       u->uu[neq], u->ee[neq]: initial values for the numerical integration.
 
-   
-   h= stepsize.
-   sampling: we sample the numerical results once every "sampling" steps.
-   filename = output binary filename. 
+       system->neq: dimension of the differential equation.
+       system->eda: name of the function that compute differential equation.
+       system->ham: name of the Hamiltonian.
+       system->rpar[]: real paramaters of the ODE system.
+       system->ipar[]: integer parameters of the ODE system. 
+
+       options.rtol[neq]:   relative tolerance.
+       options.atol[neq]:   absolute tolerance.
+       options.TheOutput:   name of the function defined by the user 
+                         that execute at each step of the integration.
+       options.filename:    name of the filename to write the 
+                         numerical solution of the integration.
+       options.iteration:   kind of numerical iteration, general or partitioned.
+       options.StageInitFn: name of the functon for the initialization of stages.
+       options.rdigits:    number of binary digits we remove from L_{n,i}
+       options.sampling:    we sample the numerical results once every "sampling" steps.
+       options.filename:    name of the output binary filename. 
 
    thread_count: number of threads for parallel computation. 
 
-   note: neq, t0, tf and some others options of the problems are 
-         initialized with initial values.
 
 *********************************************************************************
 PARAMETERS (file: def.h):
 
    You can specify next parameters:
 
-   IOUT: default form (enable otuput binary file). 
    PARALLEL: specify to run a parallel execution.
 
-   MAXIT 50 :  maximum number of fixed point iterations 
-   MAXKSW 10:  max number of steps to change second integration initialization mode.
-   RTOL,ATOL: fixed point iteration tolerances. 
-   PREC:
-       1=DOUBLEPRECISION
+   MAXIT:  maximum number of fixed point iterations 
+   RTOL,ATOL: fixed point iteration default tolerances. 
+
 
    #define DIR_TERM :  // Path Coefficients for terminal executions  
    #define DIR_MATH :  // Path Coefficients for mathematica executions
@@ -90,19 +101,20 @@ PARAMETERS (file: def.h):
 *********************************************************************************
 RESULTS:
 
-   filename (output binary format).
+   options.TheOutput: user defined function.
+   options.filename:  output binary file.
 
 ********************************************************************************
 INSTALATION (Ubuntu 16.04 lts):
 
    Two ways to execute :
 
-     Terminal execution:
-          make term-Gauss
-          ./GaussTerminal.exe
+     Unix terminal execution:
+          make term-IRKFP
+          ./Terminal-IRKFP.exe
 
       Mathematica (double)
-          make math-Gauss
+          make math-IRKFP
           Execution from mathematica notebook (see examples).
 
 

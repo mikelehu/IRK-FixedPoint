@@ -5,7 +5,7 @@
 //#include <string.h>
 
 void GaussCoefficients
-(const char *path,gauss_method *method,const toptions *options
+(const char *path,gauss_method *method,val_type h
 );
 
 

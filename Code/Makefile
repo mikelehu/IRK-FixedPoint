@@ -1,5 +1,5 @@
 #
-# make : 01-10-2016 
+# make : 18-04-2017 
 #
 # Description: Makefile for compiling IRK-Fixed-Point project.
 # System: Ubuntu 16.04 lts (64 bits)
@@ -22,27 +22,27 @@ FLAGS=-I$(MATHLINKPATH) -O2 -Wall -std=c99 -fno-common -mfma
 OMP_FLAGS=-fopenmp
 
 # Objects
-OBJECTS = GaussTerminal.o GaussInitData.o GaussCommon.o GaussUserProblem.o GaussCoefficients.o 
-REALOBJECTS = math-Gausstm.o math-Gauss.o GaussCommon.o GaussUserProblem.o GaussCoefficients.o 
+OBJECTS = Terminal-IRKFP.o  Common-IRKFP.o Problems.o GaussCoefficients.o 
+REALOBJECTS = math-IRKFPtm.o math-IRKFP.o Common-IRKFP.o Problems.o GaussCoefficients.o 
 
 .PHONY: clean help 
 
 all : 
 	make clean;
-	make term-Gauss;
-	make math-Gauss;
+	make term-IRKFP;
+	make math-IRKFP;
 
-term-Gauss: $(OBJECTS) 
-	${CC} $(OBJECTS) ${OMP_FLAGS} -lm -o GaussTerminal.exe 
+term-IRKFP: $(OBJECTS) 
+	${CC} $(OBJECTS) ${OMP_FLAGS} -lm -o Terminal-IRKFP.exe 
      
-math-Gausstm.c : math-Gauss.tm
-	${MPREP} math-Gauss.tm -o math-Gausstm.c
+math-IRKFPtm.c : math-IRKFP.tm
+	${MPREP} math-IRKFP.tm -o math-IRKFPtm.c
 
-%.o: %.c prec.h def.h 
+%.o: %.c def.h 
 	${CC} ${FLAGS} ${OMP_FLAGS} -c -I./  $<				   
 
-math-Gauss : $(REALOBJECTS)    
-	${CC}  $(REALOBJECTS) $(LIBFLAGS) ${OMP_FLAGS} -lML64i4 -lm -lrt -lstdc++ -luuid -ldl -o math-Gauss.exe 
+math-IRKFP : $(REALOBJECTS)    
+	${CC}  $(REALOBJECTS) $(LIBFLAGS) ${OMP_FLAGS} -lML64i4 -lm -lrt -lstdc++ -luuid -ldl -o math-IRKFP.exe 
 
 
 clean :
@@ -50,10 +50,9 @@ clean :
 
 help:
 	@echo "Valid targets;"
-	@echo " term-Gauss"
-	@echo " math-Gauss"
-	@echo " quad-Gauss"
-	@echo " math-GaussPar"
+	@echo " term-IRKFP"
+	@echo " math-IRKFP"
+
 
 
 
