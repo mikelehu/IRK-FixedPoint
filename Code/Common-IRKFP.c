@@ -484,7 +484,9 @@ int General_FP_It (const ode_sys *system, const solution *u, const val_type tn,
                    solver_stat *thestatptr)
 {
 
+#ifdef PARALLEL
      int extern thread_count;
+#endif
 
 /* ---------- First initializations ------------------------------------------*/
 
@@ -551,7 +553,9 @@ int Partitioned_FP_It
 
 {
 
+#ifdef PARALLEL
      int extern thread_count;
+#endif
 
 /* ---------- First initializations ------------------------------------------*/
 
@@ -824,7 +828,7 @@ void IRKFP
      if (options->TheOutput != 0)
            myfile = fopen(options->filename,"wb"); 
 
-/* ----------- initial energi (E0)   -----------------------------------------*/
+/* ----------- initial energy (E0)   -----------------------------------------*/
 
      thestatptr->E0=system->ham(neq,u,params);
      printf("Initial energy=%lg\n", thestatptr->E0);

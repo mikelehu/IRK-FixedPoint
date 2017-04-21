@@ -21,7 +21,7 @@ void GaussCoefficients
      int ns=method->ns;
      val_type sum;
 
-     char mydir[20];
+     char mydir[80];
      FILE *fileM,*fileA,*fileB,*fileC,*fileNU;
 
      char filenameM[STRMAX];

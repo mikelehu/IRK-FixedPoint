@@ -21,11 +21,11 @@
 
 #define SUCCESS 0
 #define FAIL -1
-#define STRMAX 40		// Filename maximum string.
+#define STRMAX 256		// Filename maximum string.
 #define RTOL pow(10.,-12);	// pow(2.,-40);
 #define ATOL pow(10.,-12);
 
-#define PARALLEL		// Active opem-mp parallel execution 
+//#define PARALLEL		// Active opem-mp parallel execution 
 
 #define DIR_TERM "../CoefficientsData/"    // Path Coefficients (terminal)
 #define DIR_MATH "../../CoefficientsData/" // Path Coefficients (mathematica)

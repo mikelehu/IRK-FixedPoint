@@ -149,7 +149,8 @@ void mathIRKFP (int neq, int ns, double t0, double t1,
 
     
 /* ----------- Integration of the problem  ------------------------------------*/
-      
+
+    thread_count=threads;      
 
     GaussCoefficients(DIR_MATH,&gsmethod,h);
 
