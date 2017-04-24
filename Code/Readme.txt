@@ -53,7 +53,6 @@ USE OF THE CODE:
 
    The Function call to integrate an ODE system is:
 
-     int thread_count = 1;   // the user can set the  number of threads for parallel computations. 
      IRKFP (t0,t1,h, &method, &u, &system, &options, &thestat);
       
        t0,t1:     interval of numerical integration.
@@ -109,7 +108,10 @@ PARAMETERS (file: def.h):
 
    You can specify next parameters:
 
-   PARALLEL: specify to run a parallel execution.
+   PARALLEL: define it to run a parallel execution. In this case we have to set the number of 
+             threads in the global variable named thread_count:
+
+             int thread_count = 1;   //  number of threads for parallel computations.
 
    MAXIT:  maximum number of fixed point iterations 
    RTOL,ATOL: fixed point iteration default tolerances. 
