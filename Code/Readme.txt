@@ -53,7 +53,7 @@ USE OF THE CODE:
 
    The Function call to integrate an ODE system is:
 
-     IRKFP (t0,t1,h, &method, &u, &system, &options, &thestat);
+     IRKFP (t0,t1,h,&method,&u,&system,&options,&thestat);
       
        t0,t1:     interval of numerical integration.
        h:         step size.

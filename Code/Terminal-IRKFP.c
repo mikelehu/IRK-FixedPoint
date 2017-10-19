@@ -15,7 +15,7 @@ int main()
 
 /*------ declarations --------------------------------------------------------*/    
 
-     int i,is,initmean,totmean,codfun;   
+     int i,is,initmean,totmean;   
 	
      gauss_method gsmethod;
      solution u;
@@ -48,7 +48,7 @@ int main()
                                 // The function call must be: f(neq, t, u, fu, params)
      system.ham= Ham1;          // User defined Hamiltonian of the system
                                 // The function call must be: H(neq,u, params)     
-
+     system.cod[0]=0;
 
 /* Parameters of the system */
 

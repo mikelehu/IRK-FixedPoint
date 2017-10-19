@@ -16,7 +16,7 @@ void GaussCoefficients
 (const char *path, gauss_method *method,  val_type h)
 
 {
-     int i,j;
+     int i;
      int info;
      int ns=method->ns;
      val_type sum;

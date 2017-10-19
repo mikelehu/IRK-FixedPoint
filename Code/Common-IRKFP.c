@@ -30,7 +30,7 @@
 /*									      */
 /******************************************************************************/
 
-void print_u (const int neq, const val_type *u)
+void print_u ( int neq,  val_type *u)
 {
      int i;
 
@@ -52,7 +52,7 @@ void print_u (const int neq, const val_type *u)
 /*									      */
 /******************************************************************************/
       
-void InitStat (const ode_sys *system,const gauss_method *gsmethod, 
+void InitStat ( ode_sys *system, gauss_method *gsmethod, 
                solver_stat *thestatptr)
 {
 
@@ -99,9 +99,9 @@ void InitStat (const ode_sys *system,const gauss_method *gsmethod,
 /*									      */
 /******************************************************************************/
 
-val_type NormalizedDistance ( const int neq, const int ns,
-                              const toptions *options, const val_type *z,
-                              const val_type *zold)
+val_type NormalizedDistance (  int neq,  int ns,
+                               toptions *options,  val_type *z,
+                               val_type *zold)
 {
 
 
@@ -154,7 +154,7 @@ val_type NormalizedDistance ( const int neq, const int ns,
 /*									      */
 /******************************************************************************/
 
-int StatYinit (const ode_sys *system,const gauss_method *method,
+int StatYinit ( ode_sys *system, gauss_method *method,
                solver_stat *thestatptr)
 {
 
@@ -204,7 +204,7 @@ int StatYinit (const ode_sys *system,const gauss_method *method,
 /*									      */
 /******************************************************************************/
 
-void RemoveDigits (val_type *x,const int m)
+void RemoveDigits (val_type *x, int m)
 {
 
 /* ---------- First initializations ------------------------------------------*/
@@ -231,9 +231,9 @@ void RemoveDigits (val_type *x,const int m)
 /*									      */
 /******************************************************************************/
 
-void Default_Stage_init (const solution *u,  val_type *z, const ode_sys *system,
-             const gauss_method *method,solver_stat *thestatptr,
-             const toptions *options)
+void Default_Stage_init ( solution *u,  val_type *z,  ode_sys *system,
+              gauss_method *method,solver_stat *thestatptr,
+              toptions *options)
 {
 
 
@@ -272,9 +272,9 @@ void Default_Stage_init (const solution *u,  val_type *z, const ode_sys *system,
 /*									      */
 /******************************************************************************/
 
-void Interpolated_Stage_init (const solution *u,  val_type *z, const ode_sys *system,
-             const gauss_method *method,solver_stat *thestatptr,
-             const toptions *options)
+void Interpolated_Stage_init ( solution *u,  val_type *z,  ode_sys *system,
+              gauss_method *method,solver_stat *thestatptr,
+              toptions *options)
 {
 
 
@@ -329,9 +329,9 @@ void Interpolated_Stage_init (const solution *u,  val_type *z, const ode_sys *sy
 /* 									      */
 /******************************************************************************/
 
-void StopCriterion    (const ode_sys *system, const gauss_method *method,
+void StopCriterion    ( ode_sys *system,  gauss_method *method,
                        int *D0,bool *cont,val_type *DMin, 
-                       const val_type *Y, const val_type *Yold)
+                        val_type *Y,  val_type *Yold)
 {
 /*----------------  First: initialization ------------------------------------*/
      int neq,ns;
@@ -398,9 +398,9 @@ void StopCriterion    (const ode_sys *system, const gauss_method *method,
 /******************************************************************************/
 
 
-void Fixed_point_Step ( const ode_sys *system, const solution *u, 
-                      const val_type tn, const val_type h, 
-                      const toptions *options, const gauss_method *method,
+void Fixed_point_Step (  ode_sys *system,  solution *u, 
+                       val_type tn,  val_type h, 
+                       toptions *options,  gauss_method *method,
                       solver_stat *thestatptr)
 
 { 
@@ -479,8 +479,8 @@ void Fixed_point_Step ( const ode_sys *system, const solution *u,
 /******************************************************************************/
 
 
-int General_FP_It (const ode_sys *system, const solution *u, const val_type tn,
-                   const val_type h, const gauss_method *method,
+int General_FP_It ( ode_sys *system,  solution *u,  val_type tn,
+                    val_type h,  gauss_method *method,
                    solver_stat *thestatptr)
 {
 
@@ -547,8 +547,8 @@ int General_FP_It (const ode_sys *system, const solution *u, const val_type tn,
 /******************************************************************************/
 
 int Partitioned_FP_It
-(const ode_sys *system, const solution *u, const val_type tn,
- const val_type h, const gauss_method *method,
+( ode_sys *system,  solution *u,  val_type tn,
+  val_type h,  gauss_method *method,
  solver_stat *thestatptr)
 
 {
@@ -652,10 +652,10 @@ int Partitioned_FP_It
 /*									      */
 /******************************************************************************/
  
-void MyOutput(const ode_sys *system,const gauss_method *method,
-               const val_type t, val_type h, const solution *u, 
+void MyOutput( ode_sys *system, gauss_method *method,
+                val_type t, val_type h,  solution *u, 
                solver_stat *thestatptr,
-               const parameters *params,const toptions *options,FILE *myfile)
+                parameters *params, toptions *options,FILE *myfile)
 {
 
 /* ---------- First initializations ------------------------------------------*/
@@ -712,9 +712,9 @@ void MyOutput(const ode_sys *system,const gauss_method *method,
 /* 									      */
 /******************************************************************************/
 
-void CompensatedSummation (const gauss_method *gsmethod,
-                           solution *u,const ode_sys *system,
-                           const toptions *options,const solver_stat *thestatptr)
+void CompensatedSummation ( gauss_method *gsmethod,
+                           solution *u, ode_sys *system,
+                            toptions *options, solver_stat *thestatptr)
 
 {
 /* ---------- First initializations ------------------------------------------*/
@@ -799,8 +799,8 @@ void CompensatedSummation (const gauss_method *gsmethod,
 
 void IRKFP
 (val_type t0, val_type t1, val_type h,
- const gauss_method *gsmethod, solution *u,
- const ode_sys *system, toptions *options,
+  gauss_method *gsmethod, solution *u,
+  ode_sys *system, toptions *options,
  solver_stat *thestatptr)
 
 {

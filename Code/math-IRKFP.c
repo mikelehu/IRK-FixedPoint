@@ -110,11 +110,14 @@ void mathIRKFP (int neq, int ns, double t0, double t1,
     switch (iteration)
     {
      case 0:
-       options.iteration=General_FP_It;    
+       options.iteration=General_FP_It; 
+       system.cod[0]=0;     
      break;
 
      case 1:
        options.iteration=Partitioned_FP_It;
+       system.cod[0]=1; 
+       system.cod[1]=2; 
      break;
 
      default:
