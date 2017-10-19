@@ -4,7 +4,7 @@ Readme.txt
      Gauss Implicit Runge-Kutta implementation. 
      Fixed-Point iteration.
 
-     version: 1.1 (21-04-2017).
+     version: 1.2 (19-10-2017).
 
      Article: "Reducing and monitoring round-off error propagation for sympletic
                implicit Runge-Kutta schemes" (2017). 
